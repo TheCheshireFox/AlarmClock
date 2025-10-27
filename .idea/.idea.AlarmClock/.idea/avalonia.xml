@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AvaloniaProject">
+    <option name="projectPerEditor">
+      <map>
+        <entry key="AlarmClock/App.axaml" value="AlarmClock/AlarmClock.csproj" />
+        <entry key="AlarmClock/Components/AlarmClock.axaml" value="AlarmClock/AlarmClock.csproj" />
+        <entry key="AlarmClock/Components/Clock.axaml" value="AlarmClock/AlarmClock.csproj" />
+        <entry key="AlarmClock/Components/DisplayArea.axaml" value="AlarmClock/AlarmClock.csproj" />
+        <entry key="AlarmClock/Components/Footer.axaml" value="AlarmClock/AlarmClock.csproj" />
+        <entry key="AlarmClock/Components/Header.axaml" value="AlarmClock/AlarmClock.csproj" />
+        <entry key="AlarmClock/Components/LeftNavBar.axaml" value="AlarmClock/AlarmClock.csproj" />
+        <entry key="AlarmClock/Components/NumberPicker.axaml" value="AlarmClock/AlarmClock.csproj" />
+        <entry key="AlarmClock/Components/NumberPickerWheel.axaml" value="AlarmClock/AlarmClock.csproj" />
+        <entry key="AlarmClock/Components/NumberWheelPicker.axaml" value="AlarmClock/AlarmClock.csproj" />
+        <entry key="AlarmClock/Components/RightNavBar.axaml" value="AlarmClock/AlarmClock.csproj" />
+        <entry key="AlarmClock/Components/Settings.axaml" value="AlarmClock/AlarmClock.csproj" />
+        <entry key="AlarmClock/Components/TimePicker.axaml" value="AlarmClock/AlarmClock.csproj" />
+        <entry key="AlarmClock/Components/test.axaml" value="AlarmClock/AlarmClock.csproj" />
+        <entry key="AlarmClock/MainWindow.axaml" value="AlarmClock/AlarmClock.csproj" />
+        <entry key="AlarmClock/Styles/ComboBox.Brushes.axaml" value="AlarmClock/AlarmClock.csproj" />
+        <entry key="AlarmClock/Styles/ComboBox.axaml" value="AlarmClock/AlarmClock.csproj" />
+      </map>
+    </option>
+  </component>
+</project>

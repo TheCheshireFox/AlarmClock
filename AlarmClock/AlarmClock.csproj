@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>exe</OutputType>
+        <TargetFramework>net9.0</TargetFramework>
+        <RuntimeIdentifiers>linux-x64;linux-arm64</RuntimeIdentifiers>
+        <Nullable>enable</Nullable>
+        <Configurations>Debug;Release</Configurations>
+        <Platforms>AnyCPU;arm64</Platforms>
+        <PublishSingleFile>true</PublishSingleFile>
+        <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+        <InvariantGlobalization>true</InvariantGlobalization>
+        <PublishReadyToRun>false</PublishReadyToRun>
+        <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+        <IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
+    </PropertyGroup>
+    <ItemGroup>
+        <None Remove=".gitignore"/>
+    </ItemGroup>
+    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+        <DebugType>none</DebugType>
+        <DebugSymbols>false</DebugSymbols>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Avalonia" Version="11.3.3" />
+        <PackageReference Include="Avalonia.Desktop" Version="11.3.3" />
+        <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
+        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.3.3" />
+        <PackageReference Include="Avalonia.ReactiveUI" Version="11.3.3" />
+        <PackageReference Include="Avalonia.Themes.Simple" Version="11.3.3" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.8" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.8" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.8" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.8" />
+        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.8" />
+        <PackageReference Include="Svg.Controls.Skia.Avalonia" Version="11.3.0.3" />
+    </ItemGroup>
+    <ItemGroup>
+        <AvaloniaResource Include="Assets\**"/>
+    </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\AlarmClock.Audio\AlarmClock.Audio.csproj" />
+      <ProjectReference Include="..\AlarmClock.Configuration\AlarmClock.Configuration.csproj" />
+    </ItemGroup>
+</Project>

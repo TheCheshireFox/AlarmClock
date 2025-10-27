@@ -1,0 +1,31 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:components="clr-namespace:AlarmClock.Components"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="480"
+        x:Class="AlarmClock.MainWindow"
+        Width="800"
+        Height="480"
+        Background="Black"
+        Title="AlarmClock"
+        ExtendClientAreaChromeHints="NoChrome"
+        ExtendClientAreaTitleBarHeightHint="-1"
+        ExtendClientAreaToDecorationsHint="False"
+        SystemDecorations="None"
+        WindowStartupLocation="CenterScreen"
+        CanResize="False"
+        BorderThickness="0"
+        IsHitTestVisible="True">
+    <Grid Background="black"
+          HorizontalAlignment="Stretch"
+          VerticalAlignment="Stretch"
+          ColumnDefinitions="64,*,64"
+          RowDefinitions="48,*,48">
+        <components:Header Grid.Row="0" Grid.Column="1"/>
+        <components:LeftNavBar Name="LeftNavBar" Grid.Row="1" Grid.Column="0"/>
+        <components:DisplayArea Name="DisplayArea" Grid.Row="1" Grid.Column="1"/>
+        <components:RightNavBar Name="RightNavBar" Grid.Row="1" Grid.Column="2"/>
+        <components:Footer Grid.Row="2" Grid.Column="1"/>
+    </Grid>
+</Window>

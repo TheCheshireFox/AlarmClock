@@ -1,0 +1,71 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Item content padding/height: fixes clipping in popup + closed state -->
+    <Style Selector="ComboBox">
+        <!--popup item-->
+        <Setter Property="ItemTemplate">
+            <Setter.Value>
+                <DataTemplate>
+                    <TextBlock Text="{Binding}"
+                               FontFamily="{DynamicResource LcdFont}"
+                               TextAlignment="Left"
+                               FontSize="46"
+                               LineHeight="46"
+                               Height="46"/>
+                </DataTemplate>
+            </Setter.Value>
+        </Setter>
+        <!--selected item-->
+        <Setter Property="SelectionBoxItemTemplate">
+            <Setter.Value>
+                <DataTemplate>
+                    <TextBlock Text="{Binding}"
+                               FontFamily="{DynamicResource LcdFont}"
+                               TextAlignment="Left"
+                               FontSize="46"
+                               LineHeight="46"
+                               Height="46"
+                               Padding="0,-5,0,0"/>
+                </DataTemplate>
+            </Setter.Value>
+        </Setter>
+
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+    </Style>
+
+    <Style Selector="ComboBox ComboBoxItem>TextBlock">
+        <Setter Property="FontFamily" Value="{DynamicResource LcdFont}"/>
+        <Setter Property="TextAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="FontSize" Value="46"/>
+        <Setter Property="LineHeight" Value="46"/>
+        <Setter Property="Margin" Value="0,0,0,0"/>
+        <Setter Property="Padding" Value="0,-5,0,0"/>
+        <Setter Property="ClipToBounds" Value="False"/>
+    </Style>
+    
+    <!-- Container tweaks + monochrome HC hover/selected -->
+    <Style Selector="ComboBoxItem">
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="Background" Value="{DynamicResource CbxItemBackground}"/>
+        <Setter Property="Foreground" Value="{DynamicResource CbxItemForeground}"/>
+    </Style>
+
+    <Style Selector="ComboBoxItem:pointerover">
+        <Setter Property="Background" Value="{DynamicResource CbxItemHoverBackground}"/>
+        <Setter Property="Foreground" Value="{DynamicResource CbxItemHoverForeground}"/>
+    </Style>
+
+    <Style Selector="ComboBoxItem:selected">
+        <Setter Property="Background" Value="{DynamicResource CbxItemSelectedBackground}"/>
+        <Setter Property="Foreground" Value="{DynamicResource CbxItemSelectedForeground}"/>
+    </Style>
+
+    <!-- focus ring for closed box -->
+    <Style Selector="ComboBox:focus">
+        <Setter Property="BorderBrush" Value="{DynamicResource CbxFocusBorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+    </Style>
+</Styles>

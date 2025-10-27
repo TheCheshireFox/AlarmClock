@@ -1,0 +1,13 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:components="clr-namespace:AlarmClock.Components"
+             mc:Ignorable="d" d:DesignWidth="672" d:DesignHeight="450"
+             x:Class="AlarmClock.Components.DisplayArea">
+    <Panel Name="Pages" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <components:Clock Name="Clock" Tag="Clock" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+        <components:AlarmClock Name="Alarm" Tag="Alarm" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" IsVisible="False"/>
+        <components:Settings Name="Settings" Tag="Settings" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" IsVisible="False"/>
+    </Panel>
+</UserControl>

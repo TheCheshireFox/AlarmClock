@@ -1,0 +1,10 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <SolidColorBrush x:Key="CbxItemBackground" Color="#000000"/>
+    <SolidColorBrush x:Key="CbxItemForeground" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="CbxItemHoverBackground" Color="#202020"/>
+    <SolidColorBrush x:Key="CbxItemHoverForeground" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="CbxItemSelectedBackground" Color="#404040"/>
+    <SolidColorBrush x:Key="CbxItemSelectedForeground" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="CbxFocusBorderBrush" Color="#FFFFFF"/>
+</ResourceDictionary>

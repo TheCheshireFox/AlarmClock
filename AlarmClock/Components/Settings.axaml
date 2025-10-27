@@ -1,0 +1,25 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="AlarmClock.Components.Settings"
+             FontSize="46"
+             FontFamily="{StaticResource LcdFont}">
+    <UserControl.Styles>
+        <StyleInclude Source="avares://AlarmClock/Styles/ComboBox.axaml"/>
+    </UserControl.Styles>
+    <Grid ColumnDefinitions="15,*,*,15"
+          RowDefinitions="50,50,50">
+        
+        <TextBlock Grid.Row="0" Grid.Column="1" Text="Alarm Type" />
+        <ComboBox Name="AlarmType" Grid.Row="0" Grid.Column="2" SelectedIndex="0" SelectionChanged="AlarmType_OnSelectionChanged"/>
+        
+        <TextBlock Grid.Row="1" Grid.Column="1" Text="Alarm Name" />
+        <ComboBox Name="AlarmName" Grid.Row="1" Grid.Column="2" SelectionChanged="AlarmName_OnSelectionChanged"/>
+        
+        <TextBlock Grid.Row="2" Grid.Column="1" Text="Radio" />
+        <ComboBox Name="RadioName" Grid.Row="2" Grid.Column="2" SelectionChanged="RadioName_OnSelectionChanged"/>
+        
+    </Grid>
+</UserControl>

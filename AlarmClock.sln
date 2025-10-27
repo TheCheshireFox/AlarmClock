@@ -1,0 +1,51 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlarmClock", "AlarmClock\AlarmClock.csproj", "{DEDBC186-F5E7-4D97-8EAD-869934247E3B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlarmClock.Audio", "AlarmClock.Audio\AlarmClock.Audio.csproj", "{E72E2F7B-D23F-4849-A387-5090A4BF32DB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlarmClock.Process", "AlarmClock.Process\AlarmClock.Process.csproj", "{A0DDEBF5-1E6A-4B2C-810A-D14E557D17D3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlarmClock.Configuration", "AlarmClock.Configuration\AlarmClock.Configuration.csproj", "{7FC6061E-D2DD-4932-930A-B55C64B11784}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlarmClock.Shared", "AlarmClock.Shared\AlarmClock.Shared.csproj", "{05DEC840-DE53-4B95-8EAC-2833312FAEA7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+		Release|arm64 = Release|arm64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DEDBC186-F5E7-4D97-8EAD-869934247E3B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEDBC186-F5E7-4D97-8EAD-869934247E3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DEDBC186-F5E7-4D97-8EAD-869934247E3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DEDBC186-F5E7-4D97-8EAD-869934247E3B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DEDBC186-F5E7-4D97-8EAD-869934247E3B}.Release|arm64.ActiveCfg = Release|arm64
+		{DEDBC186-F5E7-4D97-8EAD-869934247E3B}.Release|arm64.Build.0 = Release|arm64
+		{E72E2F7B-D23F-4849-A387-5090A4BF32DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E72E2F7B-D23F-4849-A387-5090A4BF32DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E72E2F7B-D23F-4849-A387-5090A4BF32DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E72E2F7B-D23F-4849-A387-5090A4BF32DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E72E2F7B-D23F-4849-A387-5090A4BF32DB}.Release|arm64.ActiveCfg = Release|Any CPU
+		{E72E2F7B-D23F-4849-A387-5090A4BF32DB}.Release|arm64.Build.0 = Release|Any CPU
+		{A0DDEBF5-1E6A-4B2C-810A-D14E557D17D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A0DDEBF5-1E6A-4B2C-810A-D14E557D17D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A0DDEBF5-1E6A-4B2C-810A-D14E557D17D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A0DDEBF5-1E6A-4B2C-810A-D14E557D17D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A0DDEBF5-1E6A-4B2C-810A-D14E557D17D3}.Release|arm64.ActiveCfg = Release|Any CPU
+		{A0DDEBF5-1E6A-4B2C-810A-D14E557D17D3}.Release|arm64.Build.0 = Release|Any CPU
+		{7FC6061E-D2DD-4932-930A-B55C64B11784}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7FC6061E-D2DD-4932-930A-B55C64B11784}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7FC6061E-D2DD-4932-930A-B55C64B11784}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7FC6061E-D2DD-4932-930A-B55C64B11784}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7FC6061E-D2DD-4932-930A-B55C64B11784}.Release|arm64.ActiveCfg = Release|Any CPU
+		{7FC6061E-D2DD-4932-930A-B55C64B11784}.Release|arm64.Build.0 = Release|Any CPU
+		{05DEC840-DE53-4B95-8EAC-2833312FAEA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05DEC840-DE53-4B95-8EAC-2833312FAEA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05DEC840-DE53-4B95-8EAC-2833312FAEA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05DEC840-DE53-4B95-8EAC-2833312FAEA7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05DEC840-DE53-4B95-8EAC-2833312FAEA7}.Release|arm64.ActiveCfg = Release|Any CPU
+		{05DEC840-DE53-4B95-8EAC-2833312FAEA7}.Release|arm64.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
