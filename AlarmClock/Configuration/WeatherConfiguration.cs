@@ -11,8 +11,8 @@ public enum WeatherProviderType
 [ConfigurationPath("weather")]
 public class WeatherConfiguration
 {
-    [TypeVariant(nameof(WeatherProviderType.None))]
-    [TypeVariant(nameof(WeatherProviderType.OpenWeather))]
+    [TypeVariant(WeatherProviderType.None)]
+    [TypeVariant(WeatherProviderType.OpenWeather)]
     public WeatherProviderType Type { get; set; } = WeatherProviderType.OpenWeather;
     public TimeSpan UpdateInterval { get; set; } = TimeSpan.FromMinutes(10);
 

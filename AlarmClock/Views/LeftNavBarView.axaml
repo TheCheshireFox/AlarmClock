@@ -1,0 +1,52 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:AlarmClock.ViewModels"
+             x:DataType="vm:NavBarViewModel"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="AlarmClock.Views.LeftNavBarView">
+    <Design.DataContext>
+        <vm:NavBarViewModel/>
+    </Design.DataContext>
+    
+    <Grid
+        VerticalAlignment="Stretch"
+        HorizontalAlignment="Stretch"
+        RowDefinitions="*,*,*,*"
+        ColumnDefinitions="10,*">
+        
+        <Image Grid.Row="0" Grid.Column="1" Source="{SvgImage /Assets/Images/clock.svg}">
+            <Interaction.Behaviors>
+                <TappedEventTrigger>
+                    <InvokeCommandAction Command="{Binding GoClock}"/>
+                </TappedEventTrigger>
+            </Interaction.Behaviors>
+        </Image>
+        
+        <Image Grid.Row="1" Grid.Column="1" Source="{SvgImage /Assets/Images/alarm.svg}">
+            <Interaction.Behaviors>
+                <TappedEventTrigger>
+                    <InvokeCommandAction Command="{Binding GoAlarm}"/>
+                </TappedEventTrigger>
+            </Interaction.Behaviors>
+        </Image>
+        
+        <Image Grid.Row="2" Grid.Column="1" Source="{SvgImage /Assets/Images/brightness.svg}">
+            <Interaction.Behaviors>
+                <TappedEventTrigger>
+                    <InvokeCommandAction Command="{Binding DisplayOff}"/>
+                </TappedEventTrigger>
+            </Interaction.Behaviors>
+        </Image>
+        
+        <Image Grid.Row="3" Grid.Column="1" Source="{SvgImage /Assets/Images/settings.svg}">
+            <Interaction.Behaviors>
+                <TappedEventTrigger>
+                    <InvokeCommandAction Command="{Binding GoSettings}"/>
+                </TappedEventTrigger>
+            </Interaction.Behaviors>
+        </Image>
+        
+    </Grid>
+</UserControl>

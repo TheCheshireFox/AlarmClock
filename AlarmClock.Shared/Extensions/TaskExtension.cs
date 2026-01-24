@@ -4,6 +4,12 @@ namespace AlarmClock.Shared.Extensions;
 
 public static class TaskExtension
 {
+    public static void ThrowIfFailed(this Task task)
+    {
+        if (task is { IsFaulted: true, Exception: not null })
+            throw task.Exception;
+    }
+    
     public static async Task WithExceptionLogging(this Task task, ILogger logger, bool propagate = false)
     {
         try

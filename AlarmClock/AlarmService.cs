@@ -1,12 +1,13 @@
 using System;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
-using AlarmClock.AlarmBuzzer;
 using AlarmClock.Announcer;
+using AlarmClock.Buzzer;
 using AlarmClock.Configuration;
-using AlarmClock.DependencyInjection;
-using AlarmClock.Utility;
-using Microsoft.Extensions.Configuration;
+using AlarmClock.Extensions;
+using AlarmClock.Shared;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -23,10 +24,8 @@ public enum AlarmState
 
 public interface IAlarmService
 {
-    event Action<TimeSpan>? Ticked;
-    event Action<AlarmState>? Changed;
-    
-    AlarmState State { get; }
+    IObservable<TimeSpan> Ticked { get; }
+    IObservable<AlarmState> StateChanged { get; }
     
     Task InitializeAsync(CancellationToken cancellationToken);
     Task StartAsync(int hours, int minutes, CancellationToken cancellationToken);
@@ -37,30 +36,33 @@ public interface IAlarmService
 
 public class AlarmService : IAlarmService
 {
+    private readonly BehaviorSubject<AlarmState> _state = new(AlarmState.Stopped);
+    private readonly BehaviorSubject<TimeSpan> _tick = new(TimeSpan.Zero);
+
     private readonly IOptionsMonitor<AlarmConfiguration> _options;
-    private readonly IJsonConfigManager _configurationManager;
-    private readonly IKeyedOptionServiceProvider<IAnnouncer> _announcerProvider;
+    private readonly IConfigManager _configurationManager;
+    private readonly IService<IAnnouncer> _announcerService;
     private readonly ILogger<AlarmService> _logger;
-    private readonly IKeyedOptionServiceProvider<IAlarmBuzzer> _alarmBuzzerProvider;
+    private readonly IService<IAlarmBuzzer> _alarmBuzzerService;
     private CancellationTokenSource _cts = new();
     private Task _alarmTask = Task.CompletedTask;
     private IAlarmBuzzer? _alarmBuzzer;
 
-    public event Action<TimeSpan>? Ticked;
-    public event Action<AlarmState>? Changed;
+    public IObservable<TimeSpan> Ticked => _tick.AsObservable();
+    public IObservable<AlarmState> StateChanged => _state.AsObservable();
     
     public AlarmState State { get; private set; }
     
     public AlarmService(IOptionsMonitor<AlarmConfiguration> options,
-        IJsonConfigManager configurationManager,
-        IKeyedOptionServiceProvider<IAlarmBuzzer> alarmBuzzerProvider,
-        IKeyedOptionServiceProvider<IAnnouncer> announcerProvider,
+        IConfigManager configurationManager,
+        IService<IAlarmBuzzer> alarmBuzzerService,
+        IService<IAnnouncer> announcerService,
         ILogger<AlarmService> logger)
     {
         _options = options;
         _configurationManager = configurationManager;
-        _alarmBuzzerProvider = alarmBuzzerProvider;
-        _announcerProvider = announcerProvider;
+        _alarmBuzzerService = alarmBuzzerService;
+        _announcerService = announcerService;
         _logger = logger;
     }
     
@@ -96,10 +98,7 @@ public class AlarmService : IAlarmService
 
     public async Task StopAsync(CancellationToken cancellationToken)
     {
-        var alarm = _options.CurrentValue;
-        alarm.Enabled = false;
-        
-        _configurationManager.Update(alarm);
+        _configurationManager.Update(_options, alarm => alarm.Enabled = false);
 
         await _cts.CancelAsync();
         await _alarmTask;
@@ -125,11 +124,11 @@ public class AlarmService : IAlarmService
     {
         target = CalculateTarget(target);
 
-        var alarm = _options.CurrentValue;
-        alarm.Enabled = true;
-        alarm.Time = target;
-        
-        _configurationManager.Update(alarm);
+        _configurationManager.Update(_options, alarm =>
+        {
+            alarm.Enabled = true;
+            alarm.Time = target;
+        });
 
         await _cts.CancelAsync();
         await _alarmTask;
@@ -157,7 +156,7 @@ public class AlarmService : IAlarmService
                 if (diff < TimeSpan.Zero)
                     diff = TimeSpan.Zero;
                 
-                Ticked?.Invoke(diff);
+                _tick.OnNext(diff);
                 
                 if (diff != TimeSpan.Zero)
                     continue;
@@ -169,7 +168,7 @@ public class AlarmService : IAlarmService
                 if (_alarmBuzzer != null)
                     await _alarmBuzzer.StopAsync(cancellationToken);
 
-                _alarmBuzzer = _alarmBuzzerProvider.Get();
+                _alarmBuzzer = _alarmBuzzerService.Get();
                 await _alarmBuzzer.PlayAsync(cancellationToken);
                     
                 break;
@@ -189,8 +188,7 @@ public class AlarmService : IAlarmService
     {
         try
         {
-            State = state;
-            Changed?.Invoke(State);
+            _state.OnNext(State = state);
         }
         catch (Exception ex)
         {
@@ -199,7 +197,7 @@ public class AlarmService : IAlarmService
     }
     
     private async Task AnnouncerSayAsync(string text, CancellationToken cancellationToken)
-        => await _announcerProvider.Get().SayAsync(text, cancellationToken);
+        => await _announcerService.Get().SayAsync(text, cancellationToken);
     
     private static DateTime CalculateTarget(DateTime target)
     {

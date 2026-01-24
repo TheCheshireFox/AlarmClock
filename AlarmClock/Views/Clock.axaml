@@ -1,0 +1,59 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="672" d:DesignHeight="450"
+             xmlns:vm="clr-namespace:AlarmClock.ViewModels"
+             xmlns:conv="clr-namespace:AlarmClock.Converters"
+             x:DataType="vm:ClockViewModel"
+             x:Class="AlarmClock.Views.ClockView">
+    <Design.DataContext>
+        <vm:ClockViewModel/>
+    </Design.DataContext>
+    
+    <UserControl.Resources>
+        <conv:TemperatureToStringConverter x:Key="TemperatureConverter"/>
+        <conv:DateTimeToDateConverter x:Key="DateConverter"/>
+        <conv:DateTimeToTimeConverter x:Key="TimeConverter"/>
+    </UserControl.Resources>
+    
+    <Grid
+        VerticalAlignment="Stretch"
+        HorizontalAlignment="Stretch"
+        RowDefinitions="100,*,*"
+        ColumnDefinitions="*">
+        
+        <StackPanel Grid.Row="0" Orientation="Horizontal" FlowDirection="RightToLeft" Width="{Binding #TimeText.Bounds.Width}" Spacing="10">
+            <TextBlock
+                Text="{Binding Temperature, Converter={StaticResource TemperatureConverter}}"
+                FontSize="64"
+                FontFamily="{StaticResource LcdFont}"
+                VerticalAlignment="Bottom"/>
+            
+            <Image
+                Source="{Binding WeatherIcon}"
+                Height="38"
+                Width="38"
+                VerticalAlignment="Bottom"
+                HorizontalAlignment="Right"
+                Margin="0,0,10,18" />
+        </StackPanel>
+
+        <TextBlock
+            Grid.Row="1"
+            Text="{Binding CurrentTime, Converter={StaticResource TimeConverter}}"
+            Name="TimeText"
+            FontSize="160"
+            FontFamily="{StaticResource LcdFont}"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Stretch"/>
+        
+        <TextBlock 
+            Grid.Row="2"
+            Text="{Binding CurrentTime, Converter={StaticResource DateConverter}}"
+            FontSize="96"
+            FontFamily="{StaticResource LcdFont}"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Stretch"/>
+    </Grid>
+</UserControl>

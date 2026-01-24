@@ -2,8 +2,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:components="clr-namespace:AlarmClock.Components"
+        xmlns:views="clr-namespace:AlarmClock.Views"
+        xmlns:vm="clr-namespace:AlarmClock.ViewModels"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="480"
+        x:DataType="vm:MainWindowViewModel"
         x:Class="AlarmClock.MainWindow"
         Width="800"
         Height="480"
@@ -17,15 +19,19 @@
         CanResize="False"
         BorderThickness="0"
         IsHitTestVisible="True">
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+    
     <Grid Background="black"
           HorizontalAlignment="Stretch"
           VerticalAlignment="Stretch"
           ColumnDefinitions="64,*,64"
           RowDefinitions="48,*,48">
-        <components:Header Grid.Row="0" Grid.Column="1"/>
-        <components:LeftNavBar Name="LeftNavBar" Grid.Row="1" Grid.Column="0"/>
-        <components:DisplayArea Name="DisplayArea" Grid.Row="1" Grid.Column="1"/>
-        <components:RightNavBar Name="RightNavBar" Grid.Row="1" Grid.Column="2"/>
-        <components:Footer Grid.Row="2" Grid.Column="1"/>
+        <views:HeaderView Grid.Row="0" Grid.Column="1" DataContext="{Binding Status}"/>
+        <views:LeftNavBarView Grid.Row="1" Grid.Column="0" DataContext="{Binding NavBar}" IsVisible="{Binding MenuVisible}"/>
+        <views:DisplayAreaView Grid.Row="1" Grid.Column="1" DataContext="{Binding DisplayArea}"/>
+        <views:RightNavBarView Grid.Row="1" Grid.Column="2" DataContext="{Binding NavBar}" IsVisible="{Binding MenuVisible}"/>
+        <views:FooterView Grid.Row="2" Grid.Column="1" DataContext="{Binding Status}"/>
     </Grid>
 </Window>

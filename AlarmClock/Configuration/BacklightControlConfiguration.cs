@@ -26,9 +26,9 @@ public enum BacklightControlPolicy
 [ConfigurationPath("Backlight")]
 public class BacklightControlConfiguration
 {
-    [TypeVariant(nameof(BacklightControlPolicy.None))]
-    [TypeVariant(nameof(BacklightControlPolicy.ALS))]
-    [TypeVariant(nameof(BacklightControlPolicy.Scheduled))]
+    [TypeVariant(BacklightControlPolicy.None)]
+    [TypeVariant(BacklightControlPolicy.ALS)]
+    [TypeVariant(BacklightControlPolicy.Scheduled)]
     public BacklightControlPolicy Policy { get; set; } = BacklightControlPolicy.None;
     public TimeSpan? DimTimeout { get; set; }
     public double DimLevel { get; set; } = 0.5;

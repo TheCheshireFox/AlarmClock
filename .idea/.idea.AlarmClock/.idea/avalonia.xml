@@ -20,6 +20,19 @@
         <entry key="AlarmClock/MainWindow.axaml" value="AlarmClock/AlarmClock.csproj" />
         <entry key="AlarmClock/Styles/ComboBox.Brushes.axaml" value="AlarmClock/AlarmClock.csproj" />
         <entry key="AlarmClock/Styles/ComboBox.axaml" value="AlarmClock/AlarmClock.csproj" />
+        <entry key="AlarmClock/Views/AlarmClock.axaml" value="AlarmClock/AlarmClock.csproj" />
+        <entry key="AlarmClock/Views/Clock.axaml" value="AlarmClock/AlarmClock.csproj" />
+        <entry key="AlarmClock/Views/DisplayArea.axaml" value="AlarmClock/AlarmClock.csproj" />
+        <entry key="AlarmClock/Views/Footer.axaml" value="AlarmClock/AlarmClock.csproj" />
+        <entry key="AlarmClock/Views/FooterView.axaml" value="AlarmClock/AlarmClock.csproj" />
+        <entry key="AlarmClock/Views/Header.axaml" value="AlarmClock/AlarmClock.csproj" />
+        <entry key="AlarmClock/Views/LeftNavBar.axaml" value="AlarmClock/AlarmClock.csproj" />
+        <entry key="AlarmClock/Views/LeftNavBarView.axaml" value="AlarmClock/AlarmClock.csproj" />
+        <entry key="AlarmClock/Views/NumberPicker.axaml" value="AlarmClock/AlarmClock.csproj" />
+        <entry key="AlarmClock/Views/RightNavBar.axaml" value="AlarmClock/AlarmClock.csproj" />
+        <entry key="AlarmClock/Views/RightNavBarView.axaml" value="AlarmClock/AlarmClock.csproj" />
+        <entry key="AlarmClock/Views/Settings.axaml" value="AlarmClock/AlarmClock.csproj" />
+        <entry key="AlarmClock/Views/TimePicker.axaml" value="AlarmClock/AlarmClock.csproj" />
       </map>
     </option>
   </component>

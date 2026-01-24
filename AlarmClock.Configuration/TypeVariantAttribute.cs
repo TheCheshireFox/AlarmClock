@@ -1,9 +1,7 @@
-using System;
-
 namespace AlarmClock.Configuration;
 
 [AttributeUsage(AttributeTargets.Property,  AllowMultiple = true)]
-public sealed class TypeVariantAttribute(string name) : Attribute
+public sealed class TypeVariantAttribute(object variant) : Attribute
 {
-    public string Name { get; } = name;
+    public object Variant { get; } = variant;
 }

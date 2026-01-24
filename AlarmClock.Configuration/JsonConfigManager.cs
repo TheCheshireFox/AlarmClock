@@ -7,19 +7,19 @@ using System.Threading;
 
 namespace AlarmClock.Configuration;
 
-public interface IJsonConfigManager
+public interface IConfigManager
 {
     void Update<T>(T value);
     void Update<T>(string section, T value);
 }
 
-public class JsonConfigManager : IJsonConfigManager
+public class ConfigManager : IConfigManager
 {
     private readonly string _path;
     private readonly JsonSerializerOptions? _opts;
     private readonly SemaphoreSlim _lock = new(1);
 
-    public JsonConfigManager(string path, JsonSerializerOptions? options = null)
+    public ConfigManager(string path, JsonSerializerOptions? options = null)
     {
         _path = path;
         _opts = options;

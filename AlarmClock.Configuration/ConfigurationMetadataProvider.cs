@@ -13,7 +13,7 @@ public static class ConfigurationMetadataProvider
 
     public static string GetPath<T>(T _) => GetPath<T>();
 
-    public static IEnumerable<string> GetTypeVariants<T>(Expression<Func<T, object>> expression)
+    public static IEnumerable<TVariant> GetTypeVariants<T, TVariant>(Expression<Func<T, TVariant>> expression)
     {
         var body = expression.Body;
         
@@ -29,6 +29,12 @@ public static class ConfigurationMetadataProvider
         if (attrs.Length == 0)
             throw new Exception($"TypeVariant attribute is not set for the type: {typeof(T)}");
 
-        return attrs.Select(x => x.Name);
+        return attrs.Select(x =>
+        {
+            if (x.Variant is TVariant variant)
+                return variant;
+            
+            throw new Exception($"Variant attribute is not set for the type: {typeof(TVariant)}");
+        });
     }
 }

@@ -1,24 +1,34 @@
 using System;
 using System.Text.Json;
-using AlarmClock.AlarmBuzzer;
 using AlarmClock.Announcer;
-using AlarmClock.Audio;
 using AlarmClock.Audio.AudioDevice;
+using AlarmClock.Audio.AudioManager;
 using AlarmClock.Audio.AudioSink;
-using AlarmClock.BacklightController;
-using AlarmClock.BacklightController.BrightnessPolicy;
+using AlarmClock.Buzzer;
 using AlarmClock.Configuration;
 using AlarmClock.DependencyInjection;
-using AlarmClock.DisplayController;
-using AlarmClock.Logger;
+using AlarmClock.Display.BacklightController;
+using AlarmClock.Display.BacklightController.BrightnessPolicy;
+using AlarmClock.Display.DisplayController;
+using AlarmClock.ListProviders;
+using AlarmClock.Logging;
 using AlarmClock.Radio;
+using AlarmClock.ServiceConfiguration;
+using AlarmClock.Shared;
+using AlarmClock.ViewModels;
+using AlarmClock.Views;
 using AlarmClock.Weather;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using AlsBrightnessPolicy = AlarmClock.BacklightController.BrightnessPolicy.AlsBrightnessPolicy;
-using SchedulerBrightnessPolicy = AlarmClock.BacklightController.BrightnessPolicy.SchedulerBrightnessPolicy;
+using ReactiveUI;
+using ReactiveUI.Avalonia;
+using Splat;
+using Splat.Microsoft.Extensions.DependencyInjection;
+using AlsBrightnessPolicy = AlarmClock.Display.BacklightController.BrightnessPolicy.AlsBrightnessPolicy;
+using LogLevel = Microsoft.Extensions.Logging.LogLevel;
+using SchedulerBrightnessPolicy = AlarmClock.Display.BacklightController.BrightnessPolicy.SchedulerBrightnessPolicy;
 
 namespace AlarmClock.Extensions;
 
@@ -42,40 +52,71 @@ public class KeyedOptionServiceProviderBuilder<TInterface, TKey>
 
 public static class ServiceCollectionExtensions
 {
+    public static IServiceCollection AddViews(this IServiceCollection services)
+    {
+        services.AddView<ClockViewModel, ClockView>();
+        services.AddView<AlarmClockViewModel, AlarmClockView>();
+        services.AddView<NumberPickerViewModel, NumberPickerView>();
+        services.AddView<TimePickerViewModel, TimePickerView>();
+        services.AddView<DisplayAreaViewModel, DisplayAreaView>();
+        services.AddView<StatusViewModel, HeaderView>();
+        services.AddView<StatusViewModel, FooterView>();
+        services.AddView<SettingsViewModel, SettingsView>();
+        services.AddView<MainWindowViewModel, MainWindow>();
+        services.AddView<NavBarViewModel, LeftNavBarView>();
+        services.AddView<NavBarViewModel, RightNavBarView>();
+
+        services.AddSingleton<INavigationHost>(sp => sp.GetRequiredService<DisplayAreaViewModel>());
+        services.AddSingleton<IScreen>(sp => sp.GetRequiredService<DisplayAreaViewModel>());
+
+        services.AddSingleton<IStatusNotifier>(sp => sp.GetRequiredService<StatusViewModel>());
+        
+        services.AddSingleton<IViewModelFactory, ViewModelFactory>();
+        
+        return services;
+    }
+    
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
         services.AddSingleton<IKeyedServiceProvider>(sp => (IKeyedServiceProvider)sp);
         
-        services.AddKeyedOptionServiceProvider<IAlarmBuzzer, BuzzerConfiguration, BuzzerType>(x => x.Type)
+        services.AddKeyedOptionService<IAlarmBuzzer, BuzzerConfiguration, BuzzerType>(x => x.Type)
             .Add<SoundAlarmBuzzer>(BuzzerType.Sound)
             .Add<RadioAlarmBuzzer>(BuzzerType.Radio);
         
-        services.AddKeyedOptionServiceProvider<IAnnouncer, AnnouncerConfiguration, AnnouncerType>(x => x.Type)
+        services.AddKeyedOptionService<IAnnouncer, AnnouncerConfiguration, AnnouncerType>(x => x.Type)
             .Add<PiperAnnouncer>(AnnouncerType.Piper)
             .Add<SilentAnnouncer>(AnnouncerType.Silent);
         
-        services.AddKeyedOptionServiceProvider<IBrightnessPolicy, BacklightControlConfiguration, BacklightControlPolicy>(x => x.Policy)
+        services.AddKeyedOptionService<IBrightnessPolicy, BacklightControlConfiguration, BacklightControlPolicy>(x => x.Policy)
             .Add<SchedulerBrightnessPolicy>(BacklightControlPolicy.Scheduled)
             .Add<AlsBrightnessPolicy>(BacklightControlPolicy.ALS)
             .Add<DummyBrightnessPolicy>(BacklightControlPolicy.None);
         
-        services.AddKeyedOptionServiceProvider<IDisplayController, DisplayControllerConfiguration, DisplayControllerType>(x => x.Type)
+        services.AddKeyedOptionService<IDisplayController, DisplayControllerConfiguration, DisplayControllerType>(x => x.Type)
             .Add<PwmDisplayController>(DisplayControllerType.PWM)
             .Add<DummyDisplayController>(DisplayControllerType.None);
         
-        services.AddKeyedOptionServiceProvider<IWeatherProvider, WeatherConfiguration, WeatherProviderType>(x => x.Type)
+        services.AddKeyedOptionService<IWeatherProvider, WeatherConfiguration, WeatherProviderType>(x => x.Type)
             .Add<OpenWeatherProvider>(WeatherProviderType.OpenWeather)
             .Add<DummyWeatherProvider>(WeatherProviderType.None);
         
         services.AddSingleton<IAlarmService, AlarmService>();
-        services.AddSingleton<IAudioDevice, AudioDevice>();
-        services.AddSingleton<IBacklightController, BacklightController.BacklightController>();
+        services.AddSingleton<IAudioManager, AudioManager>();
+        services.AddSingleton<IBacklightController, BacklightController>();
         services.AddSingleton<IRadioPlayerFactory, RadioPlayerFactory>();
         services.AddSingleton<IRadioListProvider, RadioListProvider>();
         services.AddSingleton<IAudioSink, SoxAudioSink>();
-        services.AddSingleton<IAudioDevice, AudioDevice>();
-        services.AddSingleton<IStatusBus, StatusBus>();
         services.AddSingleton<IAlarmListProvider, AlarmListProvider>();
+
+        services.AddSingleton<IBacklightControllerConfig, BacklightControllerConfig>();
+        services.AddSingleton<IBacklightSchedulerConfig, BacklightSchedulerConfig>();
+        services.AddSingleton<IOpenWeatherProviderConfig, OpenWeatherProviderConfig>();
+        services.AddSingleton<IRadioAlarmBuzzerConfig, RadioAlarmBuzzerConfig>();
+        services.AddSingleton<ISoundAlarmBuzzerConfig, SoundAlarmBuzzerConfig>();
+        services.AddSingleton<IPiperAnnouncerConfig, PiperAnnouncerConfig>();
+
+        services.AddSplat();
 
         return services;
     }
@@ -94,7 +135,7 @@ public static class ServiceCollectionExtensions
         services.ConfigureUsingPath<DisplayControllerConfiguration>(configuration);
         services.ConfigureUsingPath<WeatherConfiguration>(configuration);
 
-        services.AddSingleton<IJsonConfigManager>(_ => new JsonConfigManager(PathProvider.GetConfigPath(), new JsonSerializerOptions
+        services.AddSingleton<IConfigManager>(_ => new ConfigManager(PathProvider.GetConfigPath(), new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true,
             PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
@@ -115,18 +156,38 @@ public static class ServiceCollectionExtensions
 
         return services;
     }
-    
-    
+
+    public static IServiceCollection AddSplat(this IServiceCollection services)
+    {
+        services.UseMicrosoftDependencyResolver();
+        Locator.CurrentMutable.InitializeSplat();
+        Locator.CurrentMutable.InitializeReactiveUI(RegistrationNamespace.Avalonia);
+        
+        RxApp.MainThreadScheduler = AvaloniaScheduler.Instance;
+        
+        return services;
+    }
+
+    private static IServiceCollection AddView<TModel, TView>(this IServiceCollection services)
+        where TModel : class
+        where TView : class, IViewFor<TModel>
+    {
+        return services
+            .AddSingleton<TModel>()
+            .AddSingleton<TView>()
+            .AddSingleton<IViewFor<TModel>>(sp => sp.GetRequiredService<TView>());
+    }
+
     private static void ConfigureUsingPath<TOption>(this IServiceCollection services, IConfiguration configuration)
         where TOption : class
     {
         services.Configure<TOption>(configuration.GetSection(ConfigurationMetadataProvider.GetPath<TOption>()));
     }
     
-    private static KeyedOptionServiceProviderBuilder<T, TKey> AddKeyedOptionServiceProvider<T, TOption, TKey>(this IServiceCollection serviceCollection, Func<TOption, TKey> keyGetter)
+    private static KeyedOptionServiceProviderBuilder<T, TKey> AddKeyedOptionService<T, TOption, TKey>(this IServiceCollection serviceCollection, Func<TOption, TKey> keyGetter)
         where T : class
     {
-        serviceCollection.AddSingleton<IKeyedOptionServiceProvider<T>>(sp => new KeyedOptionServiceProvider<T, TOption>(
+        serviceCollection.AddSingleton<IService<T>>(sp => new KeyedOptionService<T, TOption>(
             sp.GetRequiredService<IOptionsMonitor<TOption>>(),
             sp.GetRequiredService<IKeyedServiceProvider>(),
             opt => keyGetter(opt) ?? throw new InvalidOperationException($"Key for they type {typeof(TOption)} is null")));

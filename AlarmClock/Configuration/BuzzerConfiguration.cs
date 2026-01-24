@@ -9,8 +9,8 @@ public enum BuzzerType
 [ConfigurationPath("Buzzer")]
 public class BuzzerConfiguration
 {
-    [TypeVariant(nameof(BuzzerType.Sound))]
-    [TypeVariant(nameof(BuzzerType.Radio))]
+    [TypeVariant(BuzzerType.Sound)]
+    [TypeVariant(BuzzerType.Radio)]
     public BuzzerType Type { get; set; } = BuzzerType.Sound;
     public SoundBuzzerConfiguration Sound { get; set; } = new();
     public  RadioBuzzerConfiguration Radio { get; set; } = new();

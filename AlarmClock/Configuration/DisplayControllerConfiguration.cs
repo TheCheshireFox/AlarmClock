@@ -18,8 +18,8 @@ public enum DisplayControllerType
 [ConfigurationPath("Display")]
 public class DisplayControllerConfiguration
 {
-    [TypeVariant(nameof(DisplayControllerType.None))]
-    [TypeVariant(nameof(DisplayControllerType.PWM))]
+    [TypeVariant(DisplayControllerType.None)]
+    [TypeVariant(DisplayControllerType.PWM)]
     public DisplayControllerType Type { get; set; } = DisplayControllerType.None;
     public PwmDisplayControllerConfiguration Pwm { get; set; } = new ();
 }

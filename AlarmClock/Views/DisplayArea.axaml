@@ -1,0 +1,25 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:rxui="http://reactiveui.net"
+             xmlns:app="clr-namespace:AlarmClock"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:AlarmClock.ViewModels"
+             x:DataType="vm:DisplayAreaViewModel"
+             mc:Ignorable="d" d:DesignWidth="672" d:DesignHeight="450"
+             x:Class="AlarmClock.Views.DisplayAreaView">
+    <Design.DataContext>
+        <vm:DisplayAreaViewModel/>
+    </Design.DataContext>
+    
+    <Panel Name="Pages" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <rxui:RoutedViewHost Router="{Binding Router}" PageTransition="{x:Null}">
+            <rxui:RoutedViewHost.DefaultContent>
+                <TextBlock>NO CONTENT</TextBlock>
+            </rxui:RoutedViewHost.DefaultContent>
+            <rxui:RoutedViewHost.ViewLocator>
+                <app:AppViewLocator />
+            </rxui:RoutedViewHost.ViewLocator>
+        </rxui:RoutedViewHost>
+    </Panel>
+</UserControl>

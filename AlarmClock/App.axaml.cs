@@ -1,34 +1,37 @@
 using System;
-using System.Linq;
-using System.Reflection;
+using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using AlarmClock.BacklightController;
-using AlarmClock.DependencyInjection;
+using AlarmClock.Display.BacklightController;
 using AlarmClock.Extensions;
-using AlarmClock.Utility;
+using AlarmClock.Shared;
+using AlarmClock.ViewModels;
 using AlarmClock.Weather;
 using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.LogicalTree;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using ReactiveUI;
+using Splat.Microsoft.Extensions.DependencyInjection;
 
 namespace AlarmClock
 {
     public class App : Application
     {
-        private readonly ServiceProvider _serviceProvider;
+        public static ServiceProvider Services { get; private set; } = null!;
 
         public App()
         {
             ServiceCollection services = [];
             services.AddServices();
+            services.AddViews();
             services.AddServiceLogging();
             services.AddConfiguration();
+            services.AddSplat();
 
-            _serviceProvider =  services.BuildServiceProvider();
+            Services = services.BuildServiceProvider();
+            Services.UseMicrosoftDependencyResolver();
         }
         
         public override void Initialize()
@@ -40,48 +43,48 @@ namespace AlarmClock
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-                desktop.Exit += (_, _) => _serviceProvider.Dispose();
+                var cts = new CancellationTokenSource();
                 
-                var scope = _serviceProvider.CreateScope();
+                desktop.Exit += (_, _) =>
+                {
+                    cts.Cancel();
+                    Services.DisposeAsync().AsTask().ConfigureAwait(false).GetAwaiter().GetResult();
+                };
 
-                desktop.MainWindow = ActivatorUtilities.CreateInstance<MainWindow>(scope.ServiceProvider);
-                desktop.MainWindow.Closed += (_, _) => scope.Dispose();
-                desktop.MainWindow.Loaded += async (_, _) => await InitializeServicesAsync();
-                
-                InjectTree(scope.ServiceProvider,  desktop.MainWindow);
+                desktop.MainWindow = Services.GetRequiredService<MainWindow>();
+                desktop.MainWindow.DataContext = Services.GetRequiredService<MainWindowViewModel>();
+
+                // force run on a thread pool to avoid UI deadlock
+                Task.Run(() => InitializeServicesAsync(cts.Token), cts.Token).GetAwaiter().GetResult();
+                InitializeDisplayArea();
             }
 
             base.OnFrameworkInitializationCompleted();
         }
 
-        // dependencies will be accessible in OnLoad
-        private static void InjectTree(IServiceProvider serviceProvider, Control control)
+        private static void InitializeDisplayArea()
         {
-            foreach (var property in control.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy))
-            {
-                if (property.GetCustomAttribute<InjectAttribute>() == null)
-                    continue;
-                
-                property.SetValue(control, serviceProvider.GetRequiredService(property.PropertyType));
-            }
+            var screen = Services.GetRequiredService<IScreen>();
+            var viewModelFactory = Services.GetRequiredService<IViewModelFactory>();
 
-            foreach (var child in control.GetLogicalDescendants().OfType<Control>())
-                InjectTree(serviceProvider, child);
+            screen.Router.NavigateAndReset
+                .Execute(viewModelFactory.Create<ClockViewModel>())
+                .Subscribe();
         }
-
-        private async Task InitializeServicesAsync()
+        
+        private static async Task InitializeServicesAsync(CancellationToken cancellationToken)
         {
-            var logger = _serviceProvider.GetRequiredService<ILogger<App>>();
+            var logger = Services.GetRequiredService<ILogger<App>>();
             logger.LogInformation("Initializing services...");
             
-            var alarmService = _serviceProvider.GetRequiredService<IAlarmService>();
-            await alarmService.InitializeAsync(ApplicationCancellation.Token);
+            var alarmService = Services.GetRequiredService<IAlarmService>();
+            await alarmService.InitializeAsync(cancellationToken);
             
-            var backlightController =  _serviceProvider.GetRequiredService<IBacklightController>();
-            await backlightController.StartAsync(ApplicationCancellation.Token);
+            var backlightController =  Services.GetRequiredService<IBacklightController>();
+            await backlightController.StartAsync(cancellationToken);
             
-            var weatherProvider = _serviceProvider.GetRequiredService<IKeyedOptionServiceProvider<IWeatherProvider>>();
-            await weatherProvider.Get().InitializeAsync(ApplicationCancellation.Token);
+            var weatherProvider = Services.GetRequiredService<IService<IWeatherProvider>>();
+            await weatherProvider.Get().InitializeAsync(cancellationToken);
             
             logger.LogInformation("Service initialized");
         }

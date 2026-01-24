@@ -1,0 +1,20 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:AlarmClock.ViewModels"
+             x:DataType="vm:StatusViewModel"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="AlarmClock.Views.HeaderView">
+    <Design.DataContext>
+        <vm:StatusViewModel/>
+    </Design.DataContext>
+    
+    <StackPanel VerticalAlignment="Stretch"
+                HorizontalAlignment="Stretch"
+                Orientation="Horizontal"
+                FlowDirection="RightToLeft">
+        <Image Name="RadioStatus" IsVisible="{Binding IsRadioEnabled}" Source="{SvgImage /Assets/Images/radio.svg}" />
+        <Image Name="AlarmStatus" IsVisible="{Binding IsAlarmEnabled}" Source="{SvgImage /Assets/Images/alarm.svg}" />
+    </StackPanel>
+</UserControl>

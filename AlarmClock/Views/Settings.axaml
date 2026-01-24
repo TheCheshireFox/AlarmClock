@@ -1,0 +1,41 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:conv="clr-namespace:AlarmClock.Converters"
+             xmlns:vm="clr-namespace:AlarmClock.ViewModels"
+             x:DataType="vm:SettingsViewModel"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="AlarmClock.Views.SettingsView"
+             FontSize="46"
+             FontFamily="{StaticResource LcdFont}">
+    <Design.DataContext>
+        <vm:SettingsViewModel/>
+    </Design.DataContext>
+    
+    <UserControl.Styles>
+        <StyleInclude Source="avares://AlarmClock/Styles/ComboBox.axaml"/>
+    </UserControl.Styles>
+    <UserControl.Resources>
+        <conv:BuzzerTypeToStringConverter x:Key="BuzzerTypeConverter"/>
+    </UserControl.Resources>
+    
+    <Grid ColumnDefinitions="15,*,*,15"
+          RowDefinitions="50,50,50">
+
+        <TextBlock Grid.Row="0" Grid.Column="1" Text="Alarm Type" />
+        <ComboBox Name="AlarmType" Grid.Row="0" Grid.Column="2" ItemsSource="{Binding AlarmTypes}" SelectedItem="{Binding SelectedAlarmType}">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Converter={StaticResource BuzzerTypeConverter}}"/>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+        
+        <TextBlock Grid.Row="1" Grid.Column="1" Text="Alarm Name" />
+        <ComboBox Name="AlarmName" Grid.Row="1" Grid.Column="2" ItemsSource="{Binding AlarmNames}" SelectedItem="{Binding SelectedAlarmName}"/>
+        
+        <TextBlock Grid.Row="2" Grid.Column="1" Text="Radio" />
+        <ComboBox Name="RadioName" Grid.Row="2" Grid.Column="2" ItemsSource="{Binding RadioNames}" SelectedItem="{Binding SelectedRadioName}"/>
+    </Grid>
+</UserControl>
