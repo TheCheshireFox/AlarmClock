@@ -2,6 +2,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Reactive;
 using System.Reactive.Disposables.Fluent;
+using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AlarmClock.Configuration;
@@ -139,7 +140,9 @@ public class SettingsViewModel : ReactiveObject, IActivatableViewModel, IRoutabl
                 .DisposeWith(disposables);
             
             this.WhenAnyValue(x => x.SelectedAlarmName)
+                .Skip(1)
                 .WhereNotNull()
+                .DistinctUntilChanged()
                 .Subscribe(alarmName =>
                 {
                     var config = buzzerConfiguration.CurrentValue;
@@ -161,7 +164,9 @@ public class SettingsViewModel : ReactiveObject, IActivatableViewModel, IRoutabl
                 .DisposeWith(disposables);
             
             this.WhenAnyValue(x => x.SelectedRadioName)
+                .Skip(1)
                 .WhereNotNull()
+                .DistinctUntilChanged()
                 .Subscribe(radioName =>
                 {
                     _configManager.Update(radioConfiguration, x => x.Name = radioName);

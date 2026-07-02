@@ -13,7 +13,6 @@ using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ReactiveUI;
-using Splat.Microsoft.Extensions.DependencyInjection;
 
 namespace AlarmClock
 {
@@ -28,10 +27,8 @@ namespace AlarmClock
             services.AddViews();
             services.AddServiceLogging();
             services.AddConfiguration();
-            services.AddSplat();
 
             Services = services.BuildServiceProvider();
-            Services.UseMicrosoftDependencyResolver();
         }
         
         public override void Initialize()

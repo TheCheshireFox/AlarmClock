@@ -24,9 +24,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using ReactiveUI;
-using ReactiveUI.Avalonia;
-using Splat;
-using Splat.Microsoft.Extensions.DependencyInjection;
 using AlsBrightnessPolicy = AlarmClock.Display.BacklightController.BrightnessPolicy.AlsBrightnessPolicy;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 using SchedulerBrightnessPolicy = AlarmClock.Display.BacklightController.BrightnessPolicy.SchedulerBrightnessPolicy;
@@ -155,16 +152,6 @@ public static class ServiceCollectionExtensions
                 .SetMinimumLevel(LogLevel.Debug);
         });
 
-        return services;
-    }
-
-    public static IServiceCollection AddSplat(this IServiceCollection services)
-    {
-        services.UseMicrosoftDependencyResolver();
-        Locator.CurrentMutable.InitializeSplat();
-        
-        RxSchedulers.MainThreadScheduler = AvaloniaScheduler.Instance;
-        
         return services;
     }
 
