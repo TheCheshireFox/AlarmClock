@@ -132,6 +132,7 @@ public static class ServiceCollectionExtensions
         services.ConfigureUsingPath<BuzzerConfiguration>(configuration);
         services.ConfigureUsingPath<DisplayControllerConfiguration>(configuration);
         services.ConfigureUsingPath<WeatherConfiguration>(configuration);
+        services.ConfigureUsingPath<RadioConfiguration>(configuration);
 
         services.AddSingleton<IConfigManager>(_ => new ConfigManager(PathProvider.GetConfigPath(), new JsonSerializerOptions
         {

@@ -50,7 +50,7 @@ public class SettingsViewModel : ReactiveObject, IActivatableViewModel, IRoutabl
     } = [];
 
     // selected item for combobox AlarmTypes
-    public BuzzerType SelectedAlarmType
+    public BuzzerType? SelectedAlarmType
     {
         get;
         set => this.RaiseAndSetIfChanged(ref field, value);
@@ -126,7 +126,9 @@ public class SettingsViewModel : ReactiveObject, IActivatableViewModel, IRoutabl
             OnRadioConfigurationChanged(radioConfiguration.CurrentValue);
 
             this.WhenAnyValue(x => x.SelectedAlarmType)
+                .Skip(1)
                 .WhereNotNull()
+                .DistinctUntilChanged()
                 .Subscribe(alarmType =>
                 {
                     AlarmNames.Replace(alarmType switch
@@ -170,7 +172,6 @@ public class SettingsViewModel : ReactiveObject, IActivatableViewModel, IRoutabl
                 .Subscribe(radioName =>
                 {
                     _configManager.Update(radioConfiguration, x => x.Name = radioName);
-                    _configManager.Update(buzzerConfiguration, x => x.Radio.Name = radioName);
                 })
                 .DisposeWith(disposables);
         });
