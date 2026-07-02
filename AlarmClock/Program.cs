@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading;
+using AlarmClock.Network;
 using Avalonia;
 using ReactiveUI.Avalonia;
 
@@ -18,6 +20,6 @@ namespace AlarmClock
             => AppBuilder.Configure<App>()
                 .UsePlatformDetect()
                 .LogToTrace()
-                .UseReactiveUI();
+                .UseReactiveUI(_ => { });
     }
 }

@@ -12,6 +12,7 @@ using AlarmClock.Display.BacklightController.BrightnessPolicy;
 using AlarmClock.Display.DisplayController;
 using AlarmClock.ListProviders;
 using AlarmClock.Logging;
+using AlarmClock.Network;
 using AlarmClock.Radio;
 using AlarmClock.ServiceConfiguration;
 using AlarmClock.Shared;
@@ -62,6 +63,7 @@ public static class ServiceCollectionExtensions
         services.AddView<StatusViewModel, HeaderView>();
         services.AddView<StatusViewModel, FooterView>();
         services.AddView<SettingsViewModel, SettingsView>();
+        services.AddView<WiFiSettingsViewModel, WiFiSettingsView>();
         services.AddView<MainWindowViewModel, MainWindow>();
         services.AddView<NavBarViewModel, LeftNavBarView>();
         services.AddView<NavBarViewModel, RightNavBarView>();
@@ -108,6 +110,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IRadioListProvider, RadioListProvider>();
         services.AddSingleton<IAudioSink, SoxAudioSink>();
         services.AddSingleton<IAlarmListProvider, AlarmListProvider>();
+        services.AddSingleton<IWiFiManager, WpaSupplicantWifiManager>();
 
         services.AddSingleton<IBacklightControllerConfig, BacklightControllerConfig>();
         services.AddSingleton<IBacklightSchedulerConfig, BacklightSchedulerConfig>();
@@ -115,8 +118,6 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IRadioAlarmBuzzerConfig, RadioAlarmBuzzerConfig>();
         services.AddSingleton<ISoundAlarmBuzzerConfig, SoundAlarmBuzzerConfig>();
         services.AddSingleton<IPiperAnnouncerConfig, PiperAnnouncerConfig>();
-
-        services.AddSplat();
 
         return services;
     }
@@ -161,9 +162,8 @@ public static class ServiceCollectionExtensions
     {
         services.UseMicrosoftDependencyResolver();
         Locator.CurrentMutable.InitializeSplat();
-        Locator.CurrentMutable.InitializeReactiveUI(RegistrationNamespace.Avalonia);
         
-        RxApp.MainThreadScheduler = AvaloniaScheduler.Instance;
+        RxSchedulers.MainThreadScheduler = AvaloniaScheduler.Instance;
         
         return services;
     }

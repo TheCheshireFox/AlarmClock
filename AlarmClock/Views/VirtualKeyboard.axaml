@@ -1,0 +1,48 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="672" d:DesignHeight="260"
+             x:Class="AlarmClock.Views.VirtualKeyboardView"
+             Background="Black">
+    <UserControl.Styles>
+        <Style Selector="Button.keyboard-key">
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="MinWidth" Value="40"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Margin" Value="2"/>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="FontFamily" Value="DejaVu Sans"/>
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Background" Value="#202020"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#606060"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+
+        <Style Selector="Button.keyboard-key:pointerover">
+            <Setter Property="Background" Value="#383838"/>
+        </Style>
+
+        <Style Selector="Button.keyboard-action">
+            <Setter Property="Background" Value="#303030"/>
+        </Style>
+
+        <Style Selector="Button.keyboard-shift.active">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="Black"/>
+        </Style>
+    </UserControl.Styles>
+
+    <Border BorderBrush="#404040"
+            BorderThickness="1"
+            Padding="4"
+            Background="#080808">
+        <StackPanel Name="KeyboardRows"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"/>
+    </Border>
+</UserControl>

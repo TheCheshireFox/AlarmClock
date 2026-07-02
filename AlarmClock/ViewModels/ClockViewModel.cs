@@ -47,14 +47,14 @@ public class ClockViewModel : ReactiveObject, IActivatableViewModel, IRoutableVi
         {
             Observable
                 .Timer(TimeSpan.Zero, TimeSpan.FromSeconds(1))
-                .ObserveOn(RxApp.MainThreadScheduler)
+                .ObserveOn(RxSchedulers.MainThreadScheduler)
                 .Subscribe(_ => CurrentTime = DateTime.Now)
                 .DisposeWith(disposables);
             
             Observable
                 .Timer(TimeSpan.Zero, TimeSpan.FromMinutes(10))
                 .SelectMany(_ => Observable.FromAsync(ct => weatherService.Get().GetWeatherAsync(ct)))
-                .ObserveOn(RxApp.MainThreadScheduler)
+                .ObserveOn(RxSchedulers.MainThreadScheduler)
                 .Subscribe(UpdateWeather, ex => logger.LogError(ex, ex.Message))
                 .DisposeWith(disposables);
         });

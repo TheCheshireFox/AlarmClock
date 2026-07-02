@@ -76,7 +76,7 @@ public sealed class OpenWeatherProvider : IWeatherProvider
         try
         {
             using var httpClient = new HttpClient();
-            var resp = JsonSerializer.Deserialize<JsonObject>(await httpClient.GetStringAsync("https://ip-api.com/json/", cancellationToken))!;
+            var resp = JsonSerializer.Deserialize<JsonObject>(await httpClient.GetStringAsync("http://ip-api.com/json/", cancellationToken))!;
             
             var lat = resp["lat"]!.GetValue<double>();
             var lon = resp["lon"]!.GetValue<double>();

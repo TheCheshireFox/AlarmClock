@@ -1,0 +1,197 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:ti="clr-namespace:Avalonia.Input.TextInput;assembly=Avalonia.Base"
+             xmlns:views="clr-namespace:AlarmClock.Views"
+             xmlns:vm="clr-namespace:AlarmClock.ViewModels"
+             x:DataType="vm:WiFiSettingsViewModel"
+             mc:Ignorable="d" d:DesignWidth="672" d:DesignHeight="384"
+             x:Class="AlarmClock.Views.WiFiSettingsView"
+             FontFamily="{StaticResource LcdFont}"
+             Background="Black">
+    <UserControl.Styles>
+        <Style Selector="Button.wifi-button">
+            <Setter Property="MinHeight" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontFamily" Value="{StaticResource LcdFont}"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="ClipToBounds" Value="False"/>
+        </Style>
+
+        <Style Selector="Button.wifi-button TextBlock">
+            <Setter Property="FontFamily" Value="{StaticResource LcdFont}"/>
+            <Setter Property="FontSize" Value="34"/>
+            <Setter Property="LineHeight" Value="34"/>
+            <Setter Property="Height" Value="34"/>
+            <Setter Property="Padding" Value="0,-4,0,0"/>
+            <Setter Property="ClipToBounds" Value="False"/>
+        </Style>
+
+        <Style Selector="TextBlock.wifi-title">
+            <Setter Property="FontSize" Value="42"/>
+            <Setter Property="LineHeight" Value="42"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <Style Selector="TextBlock.wifi-label">
+            <Setter Property="FontSize" Value="30"/>
+            <Setter Property="LineHeight" Value="30"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <Style Selector="TextBox.password-box">
+            <Setter Property="Height" Value="42"/>
+            <Setter Property="FontFamily" Value="DejaVu Sans"/>
+            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Background" Value="#101010"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#606060"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="8,0"/>
+        </Style>
+
+        <Style Selector="ToggleButton.password-toggle">
+            <Setter Property="MinHeight" Value="0"/>
+            <Setter Property="MinWidth" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontFamily" Value="{StaticResource LcdFont}"/>
+            <Setter Property="ClipToBounds" Value="False"/>
+        </Style>
+
+        <Style Selector="ToggleButton.password-toggle TextBlock">
+            <Setter Property="FontFamily" Value="{StaticResource LcdFont}"/>
+            <Setter Property="FontSize" Value="30"/>
+            <Setter Property="LineHeight" Value="30"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Padding" Value="0,-4,0,0"/>
+            <Setter Property="ClipToBounds" Value="False"/>
+        </Style>
+
+        <Style Selector="ToggleButton.password-toggle:checked">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#B0B0B0"/>
+        </Style>
+
+        <Style Selector="ListBox.network-list">
+            <Setter Property="Background" Value="Black"/>
+            <Setter Property="BorderBrush" Value="#303030"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+
+        <Style Selector="ListBoxItem">
+            <Setter Property="MinHeight" Value="50"/>
+            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="Background" Value="#080808"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+
+        <Style Selector="ListBoxItem:pointerover">
+            <Setter Property="Background" Value="#202020"/>
+        </Style>
+
+        <Style Selector="ListBoxItem:selected">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="Black"/>
+        </Style>
+    </UserControl.Styles>
+
+    <Grid RowDefinitions="44,34,*,Auto"
+          RowSpacing="6"
+          Margin="8">
+        <Grid Grid.Row="0"
+              ColumnDefinitions="120,*,132">
+            <Button Grid.Column="0"
+                    Classes="wifi-button"
+                    Command="{Binding Back}">
+                <TextBlock Text="Back"/>
+            </Button>
+
+            <TextBlock Grid.Column="1"
+                       Classes="wifi-title"
+                       Text="Wi-Fi"
+                       HorizontalAlignment="Center"/>
+
+            <Button Grid.Column="2"
+                    Classes="wifi-button"
+                    Command="{Binding RefreshNetworks}">
+                <TextBlock Text="Refresh"/>
+            </Button>
+        </Grid>
+
+        <TextBlock Grid.Row="1"
+                   Text="{Binding StatusMessage}"
+                   FontSize="28"
+                   LineHeight="28"
+                   Foreground="#B0B0B0"
+                   TextTrimming="CharacterEllipsis"/>
+
+        <Grid Grid.Row="2">
+            <ListBox Classes="network-list"
+                     IsVisible="{Binding IsNetworkListVisible}"
+                     ItemsSource="{Binding AccessPoints}"
+                     SelectedItem="{Binding SelectedSsid}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}"
+                                   FontSize="34"
+                                   LineHeight="34"
+                                   VerticalAlignment="Center"
+                                   TextTrimming="CharacterEllipsis"/>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <Grid IsVisible="{Binding IsKeyboardVisible}"
+                  VerticalAlignment="Top">
+                <Grid ColumnDefinitions="*,96,132"
+                      ColumnSpacing="6">
+                    <TextBox Grid.Column="0"
+                             Classes="password-box"
+                             IsVisible="{Binding IsPasswordHidden}"
+                             Text="{Binding Password}"
+                             PasswordChar="*"
+                             GotFocus="OnPasswordGotFocus"
+                             ti:TextInputOptions.ContentType="Password"
+                             ti:TextInputOptions.IsSensitive="True"
+                             ti:TextInputOptions.ShowSuggestions="False"/>
+
+                    <TextBox Grid.Column="0"
+                             Classes="password-box"
+                             IsVisible="{Binding IsPasswordVisible}"
+                             Text="{Binding Password}"
+                             GotFocus="OnPasswordGotFocus"
+                             ti:TextInputOptions.ContentType="Password"
+                             ti:TextInputOptions.IsSensitive="True"
+                             ti:TextInputOptions.ShowSuggestions="False"/>
+
+                    <ToggleButton Grid.Column="1"
+                                  Classes="password-toggle"
+                                  IsChecked="{Binding IsPasswordVisible}">
+                        <TextBlock Text="Show"/>
+                    </ToggleButton>
+
+                    <Button Grid.Column="2"
+                            Classes="wifi-button"
+                            Command="{Binding Connect}">
+                        <TextBlock Text="Connect"/>
+                    </Button>
+                </Grid>
+            </Grid>
+        </Grid>
+
+        <views:VirtualKeyboardView Grid.Row="3"
+                                   IsVisible="{Binding IsKeyboardVisible}"
+                                   Text="{Binding Password, Mode=TwoWay}"
+                                   SubmitCommand="{Binding HideKeyboard}"
+                                   DismissCommand="{Binding HideKeyboard}"/>
+    </Grid>
+</UserControl>

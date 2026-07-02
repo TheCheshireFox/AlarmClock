@@ -5,37 +5,141 @@
              xmlns:conv="clr-namespace:AlarmClock.Converters"
              xmlns:vm="clr-namespace:AlarmClock.ViewModels"
              x:DataType="vm:SettingsViewModel"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="672" d:DesignHeight="384"
              x:Class="AlarmClock.Views.SettingsView"
-             FontSize="46"
              FontFamily="{StaticResource LcdFont}">
-    <Design.DataContext>
-        <vm:SettingsViewModel/>
-    </Design.DataContext>
-    
     <UserControl.Styles>
         <StyleInclude Source="avares://AlarmClock/Styles/ComboBox.axaml"/>
+
+        <Style Selector="TextBlock.section-title">
+            <Setter Property="FontSize" Value="38"/>
+            <Setter Property="LineHeight" Value="38"/>
+            <Setter Property="Foreground" Value="#B0B0B0"/>
+            <Setter Property="Margin" Value="0,0,0,4"/>
+        </Style>
+
+        <Style Selector="Border.settings-section">
+            <Setter Property="BorderBrush" Value="#303030"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+            <Setter Property="Background" Value="#070707"/>
+        </Style>
+
+        <Style Selector="TextBlock.setting-label">
+            <Setter Property="FontSize" Value="38"/>
+            <Setter Property="LineHeight" Value="38"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <Style Selector="Button.settings-button">
+            <Setter Property="MinHeight" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontFamily" Value="{StaticResource LcdFont}"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="ClipToBounds" Value="False"/>
+        </Style>
+
+        <Style Selector="Button.settings-button TextBlock">
+            <Setter Property="FontFamily" Value="{StaticResource LcdFont}"/>
+            <Setter Property="FontSize" Value="38"/>
+            <Setter Property="LineHeight" Value="38"/>
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="Padding" Value="0,-5,0,0"/>
+            <Setter Property="ClipToBounds" Value="False"/>
+        </Style>
     </UserControl.Styles>
+
     <UserControl.Resources>
         <conv:BuzzerTypeToStringConverter x:Key="BuzzerTypeConverter"/>
     </UserControl.Resources>
-    
-    <Grid ColumnDefinitions="15,*,*,15"
-          RowDefinitions="50,50,50">
 
-        <TextBlock Grid.Row="0" Grid.Column="1" Text="Alarm Type" />
-        <ComboBox Name="AlarmType" Grid.Row="0" Grid.Column="2" ItemsSource="{Binding AlarmTypes}" SelectedItem="{Binding SelectedAlarmType}">
-            <ComboBox.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding Converter={StaticResource BuzzerTypeConverter}}"/>
-                </DataTemplate>
-            </ComboBox.ItemTemplate>
-        </ComboBox>
-        
-        <TextBlock Grid.Row="1" Grid.Column="1" Text="Alarm Name" />
-        <ComboBox Name="AlarmName" Grid.Row="1" Grid.Column="2" ItemsSource="{Binding AlarmNames}" SelectedItem="{Binding SelectedAlarmName}"/>
-        
-        <TextBlock Grid.Row="2" Grid.Column="1" Text="Radio" />
-        <ComboBox Name="RadioName" Grid.Row="2" Grid.Column="2" ItemsSource="{Binding RadioNames}" SelectedItem="{Binding SelectedRadioName}"/>
-    </Grid>
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                  VerticalScrollBarVisibility="Hidden">
+        <StackPanel Margin="12,8,12,0">
+            <Border Classes="settings-section">
+                <StackPanel>
+                    <TextBlock Classes="section-title" Text="Alarm"/>
+
+                    <Grid ColumnDefinitions="260,*"
+                          RowDefinitions="52,52,52"
+                          RowSpacing="6">
+                        <TextBlock Grid.Row="0" Grid.Column="0" Classes="setting-label" Text="Type"/>
+                        <ComboBox Name="AlarmType"
+                                  Grid.Row="0"
+                                  Grid.Column="1"
+                                  ItemsSource="{Binding AlarmTypes}"
+                                  SelectedItem="{Binding SelectedAlarmType}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Converter={StaticResource BuzzerTypeConverter}}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Classes="setting-label" Text="Alarm"/>
+                        <ComboBox Name="AlarmName"
+                                  Grid.Row="1"
+                                  Grid.Column="1"
+                                  ItemsSource="{Binding AlarmNames}"
+                                  SelectedItem="{Binding SelectedAlarmName}"/>
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Classes="setting-label" Text="Radio"/>
+                        <ComboBox Name="RadioName"
+                                  Grid.Row="2"
+                                  Grid.Column="1"
+                                  ItemsSource="{Binding RadioNames}"
+                                  SelectedItem="{Binding SelectedRadioName}"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <Border Classes="settings-section">
+                <Grid ColumnDefinitions="260,*"
+                      RowDefinitions="Auto,42,42,52"
+                      RowSpacing="4">
+                    <TextBlock Grid.Row="0"
+                               Grid.Column="0"
+                               Grid.ColumnSpan="2"
+                               Classes="section-title"
+                               Text="Network"/>
+
+                    <TextBlock Grid.Row="1"
+                               Grid.Column="0"
+                               Classes="setting-label"
+                               Text="Wi-Fi"/>
+
+                    <TextBlock Grid.Row="1"
+                               Grid.Column="1"
+                               Classes="setting-label"
+                               Text="{Binding WiFiSsid}"
+                               TextTrimming="CharacterEllipsis"/>
+
+                    <TextBlock Grid.Row="2"
+                               Grid.Column="0"
+                               Classes="setting-label"
+                               Text="Status"/>
+
+                    <TextBlock Grid.Row="2"
+                               Grid.Column="1"
+                               Classes="setting-label"
+                               Text="{Binding WiFiStatus}"
+                               TextTrimming="CharacterEllipsis"/>
+
+                    <Button Grid.Row="3"
+                            Grid.Column="0"
+                            Grid.ColumnSpan="2"
+                            HorizontalAlignment="Right"
+                            Classes="settings-button"
+                            Command="{Binding OpenWiFiSettings}">
+                        <TextBlock Text="Configure"/>
+                    </Button>
+                </Grid>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
 </UserControl>

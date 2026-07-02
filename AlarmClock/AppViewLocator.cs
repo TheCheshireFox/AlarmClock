@@ -8,6 +8,9 @@ public class AppViewLocator : IViewLocator
 {
     private readonly IServiceProvider _serviceProvider = App.Services;
 
-    public IViewFor? ResolveView<T>(T? viewModel, string? contract = null)
-        => (IViewFor?)_serviceProvider.GetRequiredService(typeof(IViewFor<>).MakeGenericType(viewModel?.GetType() ?? typeof(T)));
+    public IViewFor<TViewModel>? ResolveView<TViewModel>(string? contract = null) where TViewModel : class
+        => (IViewFor<TViewModel>?)_serviceProvider.GetRequiredService<IViewFor<TViewModel>>();
+
+    public IViewFor? ResolveView(object? instance, string? contract = null)
+        => (IViewFor?)_serviceProvider.GetRequiredService(typeof(IViewFor<>).MakeGenericType(instance?.GetType()!));
 }

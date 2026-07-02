@@ -12,7 +12,12 @@ public enum KillSignal
 
 public sealed partial class ScopedProcess : IAsyncDisposable
 {
-    [LibraryImport("libc", EntryPoint = "kill", SetLastError =true)]
+    private enum Errno
+    {
+        ESRCH = 3,
+    }
+    
+    [LibraryImport("libc", EntryPoint = "kill", SetLastError = true)]
     private static partial int Kill(int pid, int sig);
     
     private readonly int _disposeWaitTimeout;
@@ -39,7 +44,14 @@ public sealed partial class ScopedProcess : IAsyncDisposable
         
         var rc = Kill(Process.Id, (int)signal);
         if (rc != 0)
+        {
+            var errno = Marshal.GetLastPInvokeError();
+            
+            if (errno == (int)Errno.ESRCH)
+                return;
+            
             throw new Exception($"Unable to kill process {Process.Id} with signal {signal}: {rc}");
+        }
 
         var drainTasks = new List<Task>();
             

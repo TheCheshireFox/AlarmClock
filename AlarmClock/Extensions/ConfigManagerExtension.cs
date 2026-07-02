@@ -10,6 +10,6 @@ public static class ConfigManagerExtension
     {
         var value = options.CurrentValue;
         update(value);
-        manager.Update(options);
+        manager.Update(value);
     }
 }

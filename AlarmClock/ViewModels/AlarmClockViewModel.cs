@@ -61,12 +61,12 @@ public class AlarmClockViewModel : ReactiveObject, IActivatableViewModel, IRouta
         this.WhenActivated(disposables =>
         {
             _alarmService.Ticked
-                .ObserveOn(RxApp.MainThreadScheduler)
+                .ObserveOn(RxSchedulers.MainThreadScheduler)
                 .Subscribe(x => Countdown = x)
                 .DisposeWith(disposables);
 
             _alarmService.StateChanged
-                .ObserveOn(RxApp.MainThreadScheduler)
+                .ObserveOn(RxSchedulers.MainThreadScheduler)
                 .Subscribe(state =>
                 {
                     switch (state)
@@ -93,7 +93,7 @@ public class AlarmClockViewModel : ReactiveObject, IActivatableViewModel, IRouta
             
             Observable
                 .FromAsync(_alarmService.GetAlarmAsync)
-                .ObserveOn(RxApp.MainThreadScheduler)
+                .ObserveOn(RxSchedulers.MainThreadScheduler)
                 .Subscribe(Initialize)
                 .DisposeWith(disposables);
         });

@@ -25,11 +25,11 @@ public class StatusViewModel: ReactiveObject, IStatusNotifier
 
     public void SetAlarm(bool enabled)
     {
-        RxApp.MainThreadScheduler.Schedule(() => IsAlarmEnabled = enabled);
+        RxSchedulers.MainThreadScheduler.Schedule(() => IsAlarmEnabled = enabled);
     }
 
     public void SetRadio(bool enabled)
     {
-        RxApp.MainThreadScheduler.Schedule(() => IsRadioEnabled = enabled);
+        RxSchedulers.MainThreadScheduler.Schedule(() => IsRadioEnabled = enabled);
     }
 }

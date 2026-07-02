@@ -1,12 +1,15 @@
 using System;
 using System.Collections.ObjectModel;
+using System.Reactive;
 using System.Reactive.Disposables.Fluent;
+using System.Threading;
+using System.Threading.Tasks;
 using AlarmClock.Configuration;
 using AlarmClock.Extensions;
 using AlarmClock.ListProviders;
+using AlarmClock.Network;
 using AlarmClock.Radio;
 using AlarmClock.Shared.Extensions;
-using DynamicData;
 using Microsoft.Extensions.Options;
 using ReactiveUI;
 
@@ -17,10 +20,26 @@ public class SettingsViewModel : ReactiveObject, IActivatableViewModel, IRoutabl
     private readonly IRadioListProvider _radioListProvider;
     private readonly IAlarmListProvider _alarmListProvider;
     private readonly IConfigManager _configManager;
+    private readonly IWiFiManager _wiFiManager;
 
     public ViewModelActivator Activator { get; }
     public string UrlPathSegment { get; } = nameof(SettingsViewModel);
     public IScreen HostScreen { get; }
+
+    public ReactiveCommand<Unit, IRoutableViewModel> OpenWiFiSettings { get; }
+    public ReactiveCommand<Unit, Unit> RefreshWiFiStatus { get; }
+
+    public string WiFiSsid
+    {
+        get;
+        set => this.RaiseAndSetIfChanged(ref field, value);
+    } = string.Empty;
+
+    public string WiFiStatus
+    {
+        get;
+        set => this.RaiseAndSetIfChanged(ref field, value);
+    } = "UNKNOWN";
     
     // source for combobox
     public ObservableCollection<BuzzerType> AlarmTypes
@@ -64,18 +83,33 @@ public class SettingsViewModel : ReactiveObject, IActivatableViewModel, IRoutabl
         set => this.RaiseAndSetIfChanged(ref field, value);
     } = string.Empty;
 
-    public SettingsViewModel(IScreen screen, IRadioListProvider radioListProvider, IAlarmListProvider alarmListProvider, IOptionsMonitor<BuzzerConfiguration> buzzerConfiguration,
-        IOptionsMonitor<RadioConfiguration> radioConfiguration, IConfigManager configManager)
+    public SettingsViewModel(INavigationHost screen, IRadioListProvider radioListProvider, IAlarmListProvider alarmListProvider, IOptionsMonitor<BuzzerConfiguration> buzzerConfiguration,
+        IOptionsMonitor<RadioConfiguration> radioConfiguration, IConfigManager configManager, IWiFiManager wiFiManager)
     {
         _radioListProvider = radioListProvider;
         _alarmListProvider = alarmListProvider;
         _configManager = configManager;
+        _wiFiManager = wiFiManager;
 
         Activator = new ViewModelActivator();
         HostScreen = screen;
+        OpenWiFiSettings = ReactiveCommand.CreateFromObservable(() => screen.NavigateTo<WiFiSettingsViewModel>());
+        RefreshWiFiStatus = ReactiveCommand.CreateFromTask(RefreshWiFiStatusAsync);
         
         this.WhenActivated(disposables =>
         {
+            RefreshWiFiStatus.ThrownExceptions
+                .Subscribe(_ =>
+                {
+                    WiFiSsid = "NONE";
+                    WiFiStatus = "UNKNOWN";
+                })
+                .DisposeWith(disposables);
+
+            RefreshWiFiStatus.Execute()
+                .Subscribe()
+                .DisposeWith(disposables);
+
             AlarmTypes.Replace(ConfigurationMetadataProvider.GetTypeVariants<BuzzerConfiguration, BuzzerType>(x => x.Type));
             RadioNames.Replace(_radioListProvider.Get().Keys);
 
@@ -135,6 +169,14 @@ public class SettingsViewModel : ReactiveObject, IActivatableViewModel, IRoutabl
                 })
                 .DisposeWith(disposables);
         });
+    }
+
+    private async Task RefreshWiFiStatusAsync(CancellationToken cancellationToken)
+    {
+        var status = await _wiFiManager.GetConnectionStatusAsync(cancellationToken);
+
+        WiFiSsid = string.IsNullOrWhiteSpace(status.Ssid) ? "NONE" : status.Ssid;
+        WiFiStatus = status.Connected ? "CONNECTED" : "DISCONNECTED";
     }
     
     private void OnBuzzerConfigurationChanged(BuzzerConfiguration config)

@@ -4,6 +4,7 @@ using System.Reactive.Linq;
 using AlarmClock.ViewModels;
 using AlarmClock.Views;
 using Avalonia;
+using Avalonia.Interactivity;
 using Avalonia.Threading;
 using ReactiveUI;
 using ReactiveUI.Avalonia;
@@ -31,7 +32,7 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
                 return;
             
             InitializeHideMenu();
-            AddHandler(PointerPressedEvent, (_, _) => ResetHideMenu());
+            AddHandler(PointerPressedEvent, (_, _) => ResetHideMenu(), RoutingStrategies.Tunnel | RoutingStrategies.Bubble, true);
 
             ViewModel.NavBar.MenuVisible = false;
         

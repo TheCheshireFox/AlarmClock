@@ -13,7 +13,7 @@ public class BuzzerConfiguration
     [TypeVariant(BuzzerType.Radio)]
     public BuzzerType Type { get; set; } = BuzzerType.Sound;
     public SoundBuzzerConfiguration Sound { get; set; } = new();
-    public  RadioBuzzerConfiguration Radio { get; set; } = new();
+    public RadioBuzzerConfiguration Radio { get; set; } = new();
 }
 
 // type: sound

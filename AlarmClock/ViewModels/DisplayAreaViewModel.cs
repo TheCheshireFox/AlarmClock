@@ -25,7 +25,7 @@ public class DisplayAreaViewModel : ReactiveObject, INavigationHost, IActivatabl
         this.WhenActivated(disposables =>
         {
             alarmService.StateChanged
-                .ObserveOn(RxApp.MainThreadScheduler)
+                .ObserveOn(RxSchedulers.MainThreadScheduler)
                 .Subscribe(state =>
                 {
                     if (state == AlarmState.WentOff)

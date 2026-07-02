@@ -30,8 +30,8 @@ public partial class NumberPickerView : ReactiveUserControl<NumberPickerViewMode
         var gestureEmulator = new MouseScrollGestureEmulator(this);
         gestureEmulator.Initialize();
         
-        AddHandler(Gestures.ScrollGestureEvent, ScrollGesture);
-        AddHandler(Gestures.ScrollGestureEndedEvent, ScrollGestureEnded);
+        AddHandler(ScrollGestureEvent, OnScrollGesture);
+        AddHandler(ScrollGestureEndedEvent, OnScrollGestureEnded);
 
         this.WhenActivated(disposables =>
         {
@@ -44,13 +44,13 @@ public partial class NumberPickerView : ReactiveUserControl<NumberPickerViewMode
         });
     }
 
-    private void ScrollGesture(object? sender, ScrollGestureEventArgs e)
+    private void OnScrollGesture(object? sender, ScrollGestureEventArgs e)
     {
         ViewModel?.ScrollBy(e.Delta.Y);
         e.Handled = true;
     }
 
-    private void ScrollGestureEnded(object? sender, ScrollGestureEndedEventArgs e)
+    private void OnScrollGestureEnded(object? sender, ScrollGestureEndedEventArgs e)
     {
         e.Handled = true;
     }
