@@ -5,16 +5,9 @@ using Microsoft.Extensions.Options;
 
 namespace AlarmClock.ServiceConfiguration;
 
-public class OpenWeatherProviderConfig : IOpenWeatherProviderConfig
+public class OpenWeatherProviderConfig(IOptionsMonitor<WeatherConfiguration> weatherConfig) : IOpenWeatherProviderConfig
 {
-    private readonly IOptionsMonitor<WeatherConfiguration> _weatherConfig;
-
     public string StateFilePath => PathProvider.GetWeatherStatePath();
-    public string ApiKey => _weatherConfig.CurrentValue.OpenWeather.ApiKey;
-    public TimeSpan UpdateInterval => _weatherConfig.CurrentValue.UpdateInterval;
-    
-    public OpenWeatherProviderConfig(IOptionsMonitor<WeatherConfiguration> weatherConfig)
-    {
-        _weatherConfig = weatherConfig;
-    }
+    public string ApiKey => weatherConfig.CurrentValue.OpenWeather.ApiKey;
+    public TimeSpan UpdateInterval => weatherConfig.CurrentValue.UpdateInterval;
 }

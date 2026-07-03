@@ -5,7 +5,7 @@ namespace AlarmClock.Configuration;
 
 public static class PathProvider
 {
-    private const string ConfigName = "settings.json";
+    private const string ConfigName = "settings.toml";
     private const string WeatherStateName = "weather.json";
     private const string DefaultLocation = "~/.config/alarm_clock";
     private static readonly string[] _locations = [DefaultLocation, "/etc/alarm_clock"];

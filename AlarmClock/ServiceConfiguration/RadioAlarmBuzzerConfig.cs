@@ -4,14 +4,7 @@ using Microsoft.Extensions.Options;
 
 namespace AlarmClock.ServiceConfiguration;
 
-public class RadioAlarmBuzzerConfig : IRadioAlarmBuzzerConfig
+public class RadioAlarmBuzzerConfig(IOptionsMonitor<BuzzerConfiguration> options) : IRadioAlarmBuzzerConfig
 {
-    private readonly IOptionsMonitor<BuzzerConfiguration> _options;
-
-    public string RadioName => _options.CurrentValue.Radio.Name;
-    
-    public RadioAlarmBuzzerConfig(IOptionsMonitor<BuzzerConfiguration> options)
-    {
-        _options = options;
-    }
+    public string RadioName => options.CurrentValue.Radio.Name;
 }

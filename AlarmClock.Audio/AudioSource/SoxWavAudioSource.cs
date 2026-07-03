@@ -88,7 +88,10 @@ public sealed class SoxWavAudioSource : IAudioSource, IAsyncDisposable
     {
         await _cts.CancelAsync();
         _cts.Dispose();
-        if (_process != null) await _process.DisposeAsync();
+        
+        if (_process != null)
+            await _process.DisposeAsync();
+        
         await _copyTask.WithExceptionLogging();
         await _wavStream.DisposeAsync();
     }

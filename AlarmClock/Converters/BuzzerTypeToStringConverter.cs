@@ -17,6 +17,7 @@ public class BuzzerTypeToStringConverter : IValueConverter
         {
             BuzzerType.Radio => "RADIO",
             BuzzerType.Sound => "SOUND",
+            BuzzerType.Gpio => "BUZZER",
             _ => throw new ArgumentOutOfRangeException(nameof(value), value, null)
         };
     }

@@ -1,27 +1,7 @@
-using System.Runtime.InteropServices;
+using AlarmClock.Gpio;
 using Microsoft.Extensions.Logging;
 
 namespace AlarmClock.Display.DisplayController;
-
-file static class Lgpio
-{
-    private const string Lib = "lgpio";
-    
-    [DllImport(Lib, EntryPoint = "lgGpiochipOpen", CallingConvention = CallingConvention.Cdecl)]
-    public static extern int GpiochipOpen(int gpioDev);
-    
-    [DllImport(Lib, EntryPoint = "lgGpiochipClose", CallingConvention = CallingConvention.Cdecl)]
-    public static extern int GpiochipClose(int handle);
-    
-    [DllImport(Lib, EntryPoint = "lgTxPwm", CallingConvention = CallingConvention.Cdecl)]
-    public static extern int TxPwm(int handle, int gpio, float pwmFrequency, float pwmDutyCycle, int pwmOffset, int pwmCycles);
-    
-    [DllImport(Lib, EntryPoint = "lgGpioClaimOutput", CallingConvention = CallingConvention.Cdecl)]
-    public static extern int GpioClaimOutput(int handle, int lFlags, int line, int level);
-    
-    [DllImport(Lib, EntryPoint = "lgGpioWrite", CallingConvention = CallingConvention.Cdecl)]
-    public static extern int GpioWrite(int handle, int line, int level);
-}
 
 public interface IPwmDisplayControllerConfig
 {
@@ -32,22 +12,24 @@ public interface IPwmDisplayControllerConfig
 public sealed class PwmDisplayController : IDisplayController, IDisposable
 {
     private readonly IPwmDisplayControllerConfig _config;
+    private readonly ILGpio _lGpio;
     private readonly ILogger<PwmDisplayController> _logger;
     private readonly int _handle;
     
     private bool _on = true;
     private double _dim;
 
-    public PwmDisplayController(IPwmDisplayControllerConfig config, ILogger<PwmDisplayController> logger)
+    public PwmDisplayController(IPwmDisplayControllerConfig config, ILGpio lGpio, ILogger<PwmDisplayController> logger)
     {
         _config = config;
+        _lGpio = lGpio;
         _logger = logger;
         
-        _handle = Lgpio.GpiochipOpen(0);
+        _handle = _lGpio.Open(0);
         if (_handle < 0)
             throw new Exception("Failed to open GPIO pwm device");
 
-        _ = Lgpio.TxPwm(_handle, _config.Pin, 0, 0, 0, 0);
+        _ = _lGpio.TxPwm(_handle, _config.Pin, 0, 0, 0, 0);
         OnRaw(true);
     }
 
@@ -79,14 +61,14 @@ public sealed class PwmDisplayController : IDisplayController, IDisposable
 
     private void OnRaw(bool value)
     {
-        _ = Lgpio.TxPwm(_handle, _config.Pin, 0, 0, 0, 0);
+        _ = _lGpio.TxPwm(_handle, _config.Pin, 0, 0, 0, 0);
         
-        var rc = Lgpio.GpioClaimOutput(_handle, 0, _config.Pin, /*initial*/ 0);
+        var rc = _lGpio.ClaimOutput(_handle, 0, _config.Pin, /*initial*/ 0);
         if (rc < 0)
             throw new Exception($"GpioClaimOutput failed: {rc}");
 
         var level = value ? 1 : 0;
-        rc = Lgpio.GpioWrite(_handle, _config.Pin, level);
+        rc = _lGpio.Write(_handle, _config.Pin, level);
         if (rc < 0)
             throw new Exception($"GpioWrite failed: {rc}");
         
@@ -95,7 +77,7 @@ public sealed class PwmDisplayController : IDisplayController, IDisposable
     
     private void Pwm(double dutyCycle)
     {
-        var rc = Lgpio.TxPwm(_handle, _config.Pin, _config.Frequency, (float)dutyCycle, 0, 0);
+        var rc = _lGpio.TxPwm(_handle, _config.Pin, _config.Frequency, (float)dutyCycle, 0, 0);
         if (rc < 0)
             throw new Exception($"TxPwm failed: {rc}");
         
@@ -104,6 +86,6 @@ public sealed class PwmDisplayController : IDisplayController, IDisposable
     
     public void Dispose()
     {
-        _ = Lgpio.GpiochipClose(_handle);
+        _ = _lGpio.Close(_handle);
     }
 }

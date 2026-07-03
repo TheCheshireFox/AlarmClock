@@ -43,10 +43,9 @@ public class AlarmService : IAlarmService
     private readonly IConfigManager _configurationManager;
     private readonly IService<IAnnouncer> _announcerService;
     private readonly ILogger<AlarmService> _logger;
-    private readonly IService<IAlarmBuzzer> _alarmBuzzerService;
+    private readonly IAlarmBuzzer _alarmBuzzer;
     private CancellationTokenSource _cts = new();
     private Task _alarmTask = Task.CompletedTask;
-    private IAlarmBuzzer? _alarmBuzzer;
 
     public IObservable<TimeSpan> Ticked => _tick.AsObservable();
     public IObservable<AlarmState> StateChanged => _state.AsObservable();
@@ -55,13 +54,13 @@ public class AlarmService : IAlarmService
     
     public AlarmService(IOptionsMonitor<AlarmConfiguration> options,
         IConfigManager configurationManager,
-        IService<IAlarmBuzzer> alarmBuzzerService,
+        IAlarmBuzzer alarmBuzzer,
         IService<IAnnouncer> announcerService,
         ILogger<AlarmService> logger)
     {
         _options = options;
         _configurationManager = configurationManager;
-        _alarmBuzzerService = alarmBuzzerService;
+        _alarmBuzzer = alarmBuzzer;
         _announcerService = announcerService;
         _logger = logger;
     }
@@ -100,15 +99,11 @@ public class AlarmService : IAlarmService
     {
         _configurationManager.Update(_options, alarm => alarm.Enabled = false);
 
-        await _cts.CancelAsync();
-        await _alarmTask;
+        await ResetAlarmTaskAsync();
 
-        _cts.Dispose();
         _cts = new CancellationTokenSource();
-        _cts.Cancel();
 
-        if (_alarmBuzzer != null)
-            await _alarmBuzzer.StopAsync(cancellationToken);
+        await _alarmBuzzer.StopAsync(cancellationToken);
 
         _logger.LogInformation("Alarm stopped");
         await AnnouncerSayAsync("Alarm stopped", cancellationToken);
@@ -134,17 +129,12 @@ public class AlarmService : IAlarmService
             alarm.Time = target;
         });
 
-        await _cts.CancelAsync();
-        await _alarmTask;
+        await ResetAlarmTaskAsync();
         
-        if (_alarmBuzzer != null)
-            await _alarmBuzzer.StopAsync(cancellationToken);
+        await _alarmBuzzer.StopAsync(cancellationToken);
 
         _logger.LogInformation("Alarm set to {Time}", target);
 
-        var oldCts = _cts;
-        _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        oldCts.Dispose();
         _alarmTask = Task.Run(() => AlarmTickAsync(target, _cts.Token), _cts.Token);
         
         ChangeState(AlarmState.Started);
@@ -171,10 +161,7 @@ public class AlarmService : IAlarmService
                 
                 _logger.LogInformation("Alarm went off");
                 
-                if (_alarmBuzzer != null)
-                    await _alarmBuzzer.StopAsync(cancellationToken);
-
-                _alarmBuzzer = _alarmBuzzerService.Get();
+                await _alarmBuzzer.StopAsync(cancellationToken);
                 await _alarmBuzzer.PlayAsync(cancellationToken);
                     
                 break;
@@ -199,6 +186,20 @@ public class AlarmService : IAlarmService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error while raising Changed event");
+        }
+    }
+    
+    private async Task ResetAlarmTaskAsync()
+    {
+        await _cts.CancelAsync();
+        try
+        {
+            await _alarmTask;
+        }
+        finally
+        {
+            _cts.Dispose();
+            _cts = new CancellationTokenSource();
         }
     }
     

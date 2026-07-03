@@ -8,20 +8,15 @@ using Microsoft.Extensions.Options;
 
 namespace AlarmClock.ServiceConfiguration;
 
-public class BacklightControllerConfig : IBacklightControllerConfig
+public class BacklightControllerConfig(
+    IService<IDisplayController> displayControllerServiceService,
+    IService<IBrightnessPolicy> brightnessPolicyService,
+    IOptionsMonitor<BacklightControlConfiguration> options)
+    : IBacklightControllerConfig
 {
-    private readonly IOptionsMonitor<BacklightControlConfiguration> _options;
-    
-    public IService<IDisplayController> DisplayControllerService { get; }
-    public IService<IBrightnessPolicy> BrightnessPolicyService { get; }
-    public TimeSpan? DimTimeout => _options.CurrentValue.DimTimeout;
-    public TimeSpan? StandbyTimeout =>  _options.CurrentValue.StandbyTimeout;
-    public double DimLevel =>  _options.CurrentValue.DimLevel;
-    
-    public BacklightControllerConfig(IService<IDisplayController> displayControllerServiceService, IService<IBrightnessPolicy> brightnessPolicyService, IOptionsMonitor<BacklightControlConfiguration> options)
-    {
-        _options = options;
-        DisplayControllerService = displayControllerServiceService;
-        BrightnessPolicyService = brightnessPolicyService;
-    }
+    public IService<IDisplayController> DisplayControllerService { get; } = displayControllerServiceService;
+    public IService<IBrightnessPolicy> BrightnessPolicyService { get; } = brightnessPolicyService;
+    public TimeSpan? DimTimeout => options.CurrentValue.DimTimeout;
+    public TimeSpan? StandbyTimeout =>  options.CurrentValue.StandbyTimeout;
+    public double DimLevel =>  options.CurrentValue.DimLevel;
 }

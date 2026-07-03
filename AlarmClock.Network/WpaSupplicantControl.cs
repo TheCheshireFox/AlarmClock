@@ -43,46 +43,6 @@ internal class WpaSupplicantControl(string controlSocketDir, TimeSpan commandTim
 {
     private readonly string _controlSocket = GetControlSocketPath(controlSocketDir);
 
-    // wpa_supplicant encodes non-printable SSID bytes as \xHH (raw UTF-8 byte sequences).
-    // Regex.Unescape interprets \xHH as Unicode code points, corrupting non-ASCII SSIDs.
-    private static string UnescapeWpaString(string s)
-    {
-        var bytes = new List<byte>(s.Length);
-        var i = 0;
-        while (i < s.Length)
-        {
-            if (s[i] != '\\' || i + 1 >= s.Length)
-            {
-                bytes.Add((byte)s[i++]);
-                continue;
-            }
-
-            var escape = s[i + 1];
-            if (escape == 'x' && i + 3 < s.Length &&
-                byte.TryParse(s.AsSpan(i + 2, 2), NumberStyles.HexNumber, null, out var hex))
-            {
-                bytes.Add(hex);
-                i += 4;
-                continue;
-            }
-
-            bytes.Add(escape switch
-            {
-                '\\' => (byte)'\\',
-                '"'  => (byte)'"',
-                'n'  => (byte)'\n',
-                'r'  => (byte)'\r',
-                't'  => (byte)'\t',
-                'e'  => 0x1B,
-                '0'  => 0,
-                _    => (byte)escape
-            });
-            i += 2;
-        }
-
-        return Encoding.UTF8.GetString(bytes.ToArray());
-    }
-
     private static string GetControlSocketPath(string controlSocketDir)
     {
         if (!Directory.Exists(controlSocketDir))
@@ -229,5 +189,45 @@ internal class WpaSupplicantControl(string controlSocketDir, TimeSpan commandTim
         {
             ArrayPool<byte>.Shared.Return(buffer);
         }
+    }
+    
+    // wpa_supplicant encodes non-printable SSID bytes as \xHH (raw UTF-8 byte sequences).
+    // Regex.Unescape interprets \xHH as Unicode code points, corrupting non-ASCII SSIDs.
+    private static string UnescapeWpaString(string s)
+    {
+        var bytes = new List<byte>(s.Length);
+        var i = 0;
+        while (i < s.Length)
+        {
+            if (s[i] != '\\' || i + 1 >= s.Length)
+            {
+                bytes.Add((byte)s[i++]);
+                continue;
+            }
+
+            var escape = s[i + 1];
+            if (escape == 'x' && i + 3 < s.Length &&
+                byte.TryParse(s.AsSpan(i + 2, 2), NumberStyles.HexNumber, null, out var hex))
+            {
+                bytes.Add(hex);
+                i += 4;
+                continue;
+            }
+
+            bytes.Add(escape switch
+            {
+                '\\' => (byte)'\\',
+                '"'  => (byte)'"',
+                'n'  => (byte)'\n',
+                'r'  => (byte)'\r',
+                't'  => (byte)'\t',
+                'e'  => 0x1B,
+                '0'  => 0,
+                _    => (byte)escape
+            });
+            i += 2;
+        }
+
+        return Encoding.UTF8.GetString(bytes.ToArray());
     }
 }

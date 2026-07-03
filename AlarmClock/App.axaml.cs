@@ -1,7 +1,8 @@
 using System;
-using System.Reactive.Linq;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using AlarmClock.Configuration.Toml;
 using AlarmClock.Display.BacklightController;
 using AlarmClock.Extensions;
 using AlarmClock.Shared;
@@ -13,11 +14,18 @@ using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ReactiveUI;
+using Tomlyn;
 
 namespace AlarmClock
 {
     public class App : Application
     {
+        private static readonly TomlSerializerOptions _configSerializerOptions = new()
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
+            Converters = [new TomlEnumStringConverter()]
+        };
+        
         public static ServiceProvider Services { get; private set; } = null!;
 
         public App()
@@ -26,7 +34,7 @@ namespace AlarmClock
             services.AddServices();
             services.AddViews();
             services.AddServiceLogging();
-            services.AddConfiguration();
+            services.AddConfiguration(_configSerializerOptions);
 
             Services = services.BuildServiceProvider();
         }

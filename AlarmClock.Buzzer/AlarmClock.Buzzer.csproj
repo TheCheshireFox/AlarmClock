@@ -8,7 +8,9 @@
 
     <ItemGroup>
       <ProjectReference Include="..\AlarmClock.Audio\AlarmClock.Audio.csproj" />
+      <ProjectReference Include="..\AlarmClock.Gpio\AlarmClock.Gpio.csproj" />
       <ProjectReference Include="..\AlarmClock.Radio\AlarmClock.Radio.csproj" />
+      <ProjectReference Include="..\AlarmClock.Shared\AlarmClock.Shared.csproj" />
     </ItemGroup>
 
     <ItemGroup>
