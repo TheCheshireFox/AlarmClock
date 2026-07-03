@@ -102,10 +102,14 @@ public class AlarmService : IAlarmService
 
         await _cts.CancelAsync();
         await _alarmTask;
-        
+
+        _cts.Dispose();
+        _cts = new CancellationTokenSource();
+        _cts.Cancel();
+
         if (_alarmBuzzer != null)
             await _alarmBuzzer.StopAsync(cancellationToken);
-        
+
         _logger.LogInformation("Alarm stopped");
         await AnnouncerSayAsync("Alarm stopped", cancellationToken);
         
@@ -137,8 +141,10 @@ public class AlarmService : IAlarmService
             await _alarmBuzzer.StopAsync(cancellationToken);
 
         _logger.LogInformation("Alarm set to {Time}", target);
-        
+
+        var oldCts = _cts;
         _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        oldCts.Dispose();
         _alarmTask = Task.Run(() => AlarmTickAsync(target, _cts.Token), _cts.Token);
         
         ChangeState(AlarmState.Started);

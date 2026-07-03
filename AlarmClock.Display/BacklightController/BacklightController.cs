@@ -108,6 +108,7 @@ public class BacklightController : IBacklightController
             return;
 
         _config.DisplayControllerService.Get().On(false);
+        _standbyTimer?.Stop();
     }
     
     private static Timer CreateDisplayTimer(TimeSpan interval, Action action)

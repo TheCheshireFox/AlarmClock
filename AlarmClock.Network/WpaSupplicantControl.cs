@@ -1,7 +1,8 @@
 using System.Buffers;
+using System.Globalization;
 using System.Net.Sockets;
 using System.Text;
-using System.Text.RegularExpressions;
+using Microsoft.Extensions.Logging;
 
 namespace AlarmClock.Network;
 
@@ -38,10 +39,49 @@ public enum ScanStatus
     FailBusy
 }
 
-public class WpaSupplicantControl(string controlSocketDir = "/run/wpa_supplicant", TimeSpan? commandTimeout = null)
+internal class WpaSupplicantControl(string controlSocketDir, TimeSpan commandTimeout, ILogger logger)
 {
-    private readonly TimeSpan _commandTimeout = commandTimeout ?? TimeSpan.MaxValue;
     private readonly string _controlSocket = GetControlSocketPath(controlSocketDir);
+
+    // wpa_supplicant encodes non-printable SSID bytes as \xHH (raw UTF-8 byte sequences).
+    // Regex.Unescape interprets \xHH as Unicode code points, corrupting non-ASCII SSIDs.
+    private static string UnescapeWpaString(string s)
+    {
+        var bytes = new List<byte>(s.Length);
+        var i = 0;
+        while (i < s.Length)
+        {
+            if (s[i] != '\\' || i + 1 >= s.Length)
+            {
+                bytes.Add((byte)s[i++]);
+                continue;
+            }
+
+            var escape = s[i + 1];
+            if (escape == 'x' && i + 3 < s.Length &&
+                byte.TryParse(s.AsSpan(i + 2, 2), NumberStyles.HexNumber, null, out var hex))
+            {
+                bytes.Add(hex);
+                i += 4;
+                continue;
+            }
+
+            bytes.Add(escape switch
+            {
+                '\\' => (byte)'\\',
+                '"'  => (byte)'"',
+                'n'  => (byte)'\n',
+                'r'  => (byte)'\r',
+                't'  => (byte)'\t',
+                'e'  => 0x1B,
+                '0'  => 0,
+                _    => (byte)escape
+            });
+            i += 2;
+        }
+
+        return Encoding.UTF8.GetString(bytes.ToArray());
+    }
 
     private static string GetControlSocketPath(string controlSocketDir)
     {
@@ -94,7 +134,8 @@ public class WpaSupplicantControl(string controlSocketDir = "/run/wpa_supplicant
             .Skip(1)
             .Select(x => x.Split('\t', 5))
             .Where(x => x.Length == 5)
-            .Select(x => Regex.Unescape(x[4]))
+            .Select(x => UnescapeWpaString(x[4]))
+            .Where(s => s.Length > 0)
             .ToList();
     }
 
@@ -148,17 +189,23 @@ public class WpaSupplicantControl(string controlSocketDir = "/run/wpa_supplicant
     
     private async Task<string> SendCommandAsync(string command, CancellationToken cancellationToken)
     {
+        logger.LogDebug("Sending command: {command}", command);
+        
         using var localSocket = LocalSocket.Create();
         using var socket = new Socket(AddressFamily.Unix, SocketType.Dgram, ProtocolType.Unspecified);
 
         using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        cts.CancelAfter(_commandTimeout);
+        cts.CancelAfter(commandTimeout);
         
         socket.Bind(new UnixDomainSocketEndPoint(localSocket.Path));
         
         await socket.ConnectAsync(new UnixDomainSocketEndPoint(_controlSocket), cts.Token);
         await socket.SendAsync(Encoding.UTF8.GetBytes(command), SocketFlags.None, cts.Token);
-        return await ReceiveAsync(socket, cts.Token);
+        var response = await ReceiveAsync(socket, cts.Token);
+        
+        logger.LogDebug("Received response: {response}", response);
+        
+        return response;
     }
     
     private async Task SendOkCommandAsync(string command, CancellationToken cancellationToken)

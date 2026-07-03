@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
-using System.Net.Http.Headers;
+using System.Text;
+using System.Text.Json;
 using AlarmClock.Audio.AudioDevice;
 using AlarmClock.Audio.AudioManager;
 using AlarmClock.Audio.AudioSource;
@@ -68,7 +69,7 @@ public sealed class PiperAnnouncer : IAnnouncer, IAsyncDisposable
     {
         var req = new HttpRequestMessage(HttpMethod.Post, _config.Url)
         {
-            Content = new StringContent($"{{\"text\":\"{phrase}\"}}", new MediaTypeHeaderValue("application/json"))
+            Content = new StringContent(JsonSerializer.Serialize(new { text = phrase }), Encoding.UTF8, "application/json")
         };
 
         var completionOption = _config.Prefetch

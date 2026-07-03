@@ -1,15 +1,14 @@
-using System.Globalization;
-using System.Net.Sockets;
-using System.Text;
+using Microsoft.Extensions.Logging;
 
 namespace AlarmClock.Network;
 
-public class WpaSupplicantWifiManager : IWiFiManager
+public class WpaSupplicantWifiManager(ILogger<WpaSupplicantWifiManager> logger) : IWiFiManager
 {
+    private const string WpaSupplicantPath = "/var/run/wpa_supplicant";
     private static readonly TimeSpan _commandTimeout = TimeSpan.FromSeconds(10);
     private static readonly TimeSpan _scanDelay = TimeSpan.FromSeconds(3);
 
-    private readonly WpaSupplicantControl _control = new(commandTimeout: _commandTimeout);
+    private readonly WpaSupplicantControl _control = new(WpaSupplicantPath, _commandTimeout, logger);
 
     public async Task<ConnectionStatus> GetConnectionStatusAsync(CancellationToken cancellationToken)
     {
@@ -48,16 +47,20 @@ public class WpaSupplicantWifiManager : IWiFiManager
             var connected = await WaitForConnectionAsync(ssid, cancellationToken);
             if (!connected)
             {
-                await _control.RemoveNetworkAsync(networkId, cancellationToken);
+                logger.LogWarning("Failed to connect to {Ssid}", ssid);
+
+                await _control.RemoveNetworkAsync(networkId, CancellationToken.None);
                 return false;
             }
 
             await _control.SaveConfigAsync(cancellationToken);
             return true;
         }
-        catch
+        catch (Exception ex)
         {
-            await _control.RemoveNetworkAsync(networkId, cancellationToken);
+            logger.LogError(ex, "Failed to connect to {Ssid}", ssid);
+
+            await _control.RemoveNetworkAsync(networkId, CancellationToken.None);
             throw;
         }
     }
@@ -71,7 +74,7 @@ public class WpaSupplicantWifiManager : IWiFiManager
         {
             while (!cts.IsCancellationRequested)
             {
-                var status = await _control.GetStatusAsync(cancellationToken);
+                var status = await _control.GetStatusAsync(cts.Token);
                 var connected = status.TryGetValue("wpa_state", out var state) && state is "COMPLETED";
                 var connectedSsid = status.GetValueOrDefault("ssid", string.Empty);
 
