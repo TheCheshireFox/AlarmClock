@@ -20,8 +20,13 @@ public class TomlConfigManager(string path, TomlSerializerOptions opts) : IConfi
         _lock.Wait();
         try
         {
-            var pathSegments = section.Split(':');
-            var toml = Load();
+            var pathSegments = section
+                .Split(':')
+                .Select(x => opts.PropertyNamingPolicy?.ConvertName(x) ?? x)
+                .ToArray();
+            
+            var root = Load();
+            var toml = root;
 
             foreach (var name in pathSegments[..^1])
             {
@@ -33,14 +38,16 @@ public class TomlConfigManager(string path, TomlSerializerOptions opts) : IConfi
                 {
                     if (toml[name] is not TomlTable table)
                         throw new InvalidOperationException($"Invalid type for {name}");
-                    
+
                     toml = table;
                 }
             }
 
-            toml[pathSegments[^1]] = value;
+            var serialized = TomlSerializer.Serialize(value, opts);
+            toml[pathSegments[^1]] = TomlSerializer.Deserialize<TomlTable>(serialized, opts)
+                                     ?? throw new InvalidOperationException($"Invalid type for {pathSegments[^1]}");
 
-            Save(toml);
+            Save(root);
         }
         finally
         {

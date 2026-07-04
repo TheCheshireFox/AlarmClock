@@ -20,10 +20,13 @@
     <PropertyGroup Condition="'$(Configuration)' == 'Release'">
         <DebugType>none</DebugType>
         <DebugSymbols>false</DebugSymbols>
-        <DefineConstants>TRACE;NOLGPIO</DefineConstants>
+        <DefineConstants>TRACE</DefineConstants>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-      <DefineConstants>TRACE;NOLGPIO</DefineConstants>
+      <DefineConstants>TRACE</DefineConstants>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Platform)' == 'AnyCPU'">
+        <DefineConstants>$(DefineConstants);NOLGPIO</DefineConstants>
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Avalonia" Version="12.0.5" />

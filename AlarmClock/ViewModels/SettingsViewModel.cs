@@ -135,6 +135,7 @@ public class SettingsViewModel : ReactiveObject, IActivatableViewModel, IRoutabl
                     {
                         BuzzerType.Radio => _radioListProvider.Get().Keys,
                         BuzzerType.Sound => _alarmListProvider.Get().Keys,
+                        BuzzerType.Gpio => [],
                         _ => throw new ArgumentOutOfRangeException(nameof(alarmType), alarmType, null)
                     });
                     SelectedAlarmName = AlarmNames.Any() ? AlarmNames[0] : string.Empty;
@@ -158,6 +159,9 @@ public class SettingsViewModel : ReactiveObject, IActivatableViewModel, IRoutabl
                         case BuzzerType.Radio:
                             config.Type = BuzzerType.Radio;
                             config.Radio.Name = alarmName;
+                            break;
+                        case BuzzerType.Gpio:
+                            config.Type = BuzzerType.Gpio;
                             break;
                     }
         
@@ -198,6 +202,11 @@ public class SettingsViewModel : ReactiveObject, IActivatableViewModel, IRoutabl
                 SelectedAlarmType = BuzzerType.Sound;
                 AlarmNames.Replace(_alarmListProvider.Get().Keys);
                 SelectedAlarmName = config.Sound.Name;
+                break;
+            case BuzzerType.Gpio:
+                SelectedAlarmType = BuzzerType.Gpio;
+                AlarmNames.Clear();
+                SelectedAlarmName = string.Empty;
                 break;
             default:
                 SelectedAlarmType = BuzzerType.Sound;

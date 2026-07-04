@@ -31,6 +31,8 @@ public sealed class PwmDisplayController : IDisplayController, IDisposable
 
         _ = _lGpio.TxPwm(_handle, _config.Pin, 0, 0, 0, 0);
         OnRaw(true);
+        
+        _logger.LogInformation("PWM display initialized on pin {Pin} with dim PWM frequency {Frequency}", _config.Pin, _config.Frequency);
     }
 
     public bool On(bool value)

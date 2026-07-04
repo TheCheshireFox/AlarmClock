@@ -81,7 +81,8 @@ file sealed class TomlConfigurationFileParser
 
     private void EnterContext(string context)
     {
-        _paths.Push(_paths.Count > 0 ? _paths.Peek() + ConfigurationPath.KeyDelimiter + context : context);
+        var normalized = context.Replace("_", "");
+        _paths.Push(_paths.Count > 0 ? _paths.Peek() + ConfigurationPath.KeyDelimiter + normalized : normalized);
     }
 
     private void ExitContext() => _paths.Pop();
