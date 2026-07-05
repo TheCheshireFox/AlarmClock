@@ -11,35 +11,28 @@ public interface ISoundAlarmBuzzerConfig
     Stream? OpenSoundStream();
 }
 
-public class SoundAlarmBuzzer : IAlarmBuzzer
+public class SoundAlarmBuzzer(
+    ISoundAlarmBuzzerConfig config,
+    IAudioManager audioManager,
+    ILogger<SoundAlarmBuzzer> logger)
+    : IAlarmBuzzer
 {
-    private readonly ISoundAlarmBuzzerConfig _config;
-    private readonly IAudioManager _audioManager;
-    private readonly ILogger<SoundAlarmBuzzer> _logger;
-
     private (IAudioSession Session, SoxWavAudioSource Client)? _audioSession;
-
-    public SoundAlarmBuzzer(ISoundAlarmBuzzerConfig config, IAudioManager audioManager, ILogger<SoundAlarmBuzzer> logger)
-    {
-        _config = config;
-        _audioManager = audioManager;
-        _logger = logger;
-    }
 
     public async Task PlayAsync(CancellationToken cancellationToken)
     {
-        await using var stream = _config.OpenSoundStream();
+        await using var stream = config.OpenSoundStream();
         if (stream == null)
-            throw new Exception($"Alarm {_config.SoundName} not found.");
+            throw new Exception($"Alarm {config.SoundName} not found.");
         
         await StopAsync(cancellationToken);
         
         var client = new SoxWavAudioSource(stream, []);
-        var session = await _audioManager.OpenSessionAsync(client, AudioPriority.Exclusive, cancellationToken);
+        var session = await audioManager.OpenSessionAsync(client, AudioPriority.Exclusive, cancellationToken);
         
         _audioSession = (session, client);
         
-        _logger.LogInformation("Started {Name} sound alarm", _config.SoundName);
+        logger.LogInformation("Started {Name} sound alarm", config.SoundName);
     }
 
     public async Task StopAsync(CancellationToken cancellation)
@@ -52,6 +45,6 @@ public class SoundAlarmBuzzer : IAlarmBuzzer
 
         _audioSession = null;
         
-        _logger.LogInformation("Sound alarm stopped");
+        logger.LogInformation("Sound alarm stopped");
     }
 }

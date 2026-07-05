@@ -1,6 +1,7 @@
 using AlarmClock.Audio.AudioDevice;
 using AlarmClock.Audio.AudioSink;
 using AlarmClock.Audio.AudioSource;
+using AlarmClock.Shared.Extensions;
 using Microsoft.Extensions.Logging;
 
 namespace AlarmClock.Audio.AudioManager;
@@ -29,7 +30,7 @@ public sealed class AudioManager : IAudioManager
         var nextSource = await SwitchCurrentSessionToNewAsync(session, priority, cancellationToken);
         
         if (nextSource != null)
-            await SwitchSourceSerializedAsync(nextSource, cancellationToken);
+            await SwitchSourceSerializedAsync(nextSource);
         
         _logger.LogInformation("New audio session created: {Type}", source.GetType().Name);
         return session;
@@ -52,15 +53,14 @@ public sealed class AudioManager : IAudioManager
         var nextSource = await SwitchCurrentSessionToNextAsync(source, cancellationToken);
         
         if (nextSource != null)
-            await SwitchSourceSerializedAsync(nextSource, cancellationToken);
+            await SwitchSourceSerializedAsync(nextSource);
         
         _logger.LogInformation("Audio session completed: {Type}", source.GetType().Name);
     }
     
     private async Task<IAudioSource?> SwitchCurrentSessionToNewAsync(AudioSession session, AudioPriority priority, CancellationToken cancellationToken)
     {
-        await _stateLock.WaitAsync(cancellationToken);
-        try
+        using (await _stateLock.LockAsync(cancellationToken))
         {
             if (!_queue.TryEnqueue(session, priority))
                 throw new InvalidOperationException("Session already exists");
@@ -69,24 +69,17 @@ public sealed class AudioManager : IAudioManager
             if (activeSession == null)
                 throw new InvalidOperationException("Session was added but not in queue");
 
-            if (activeSession != _currentSession)
-            {
-                _currentSession = activeSession;
-                return _currentSession.Source;
-            }
+            if (activeSession == _currentSession)
+                return null;
+            
+            _currentSession = activeSession;
+            return _currentSession.Source;
         }
-        finally
-        {
-            _stateLock.Release();
-        }
-
-        return null;
     }
 
     private async Task<IAudioSource?> SwitchCurrentSessionToNextAsync(IAudioSource oldSource, CancellationToken cancellationToken)
     {
-        await _stateLock.WaitAsync(cancellationToken);
-        try
+        using (await _stateLock.LockAsync(cancellationToken))
         {
             var session = _queue.RemoveBy(x => x.Source == oldSource);
             session?.Completed.TrySetResult();
@@ -98,23 +91,14 @@ public sealed class AudioManager : IAudioManager
             _currentSession = _queue.GetActive();
             return _currentSession?.Source;
         }
-        finally
-        {
-            _stateLock.Release();
-        }
     }
     
     // we can't allow user cancellation at this point yet, otherwise we will have _currentSession and _connection desync
-    private async Task SwitchSourceSerializedAsync(IAudioSource? source, CancellationToken _)
+    private async Task SwitchSourceSerializedAsync(IAudioSource? source)
     {
-        await _switchLock.WaitAsync(_cts.Token);
-        try
+        using (await _switchLock.LockAsync(_cts.Token))
         {
             await _connection.SwitchSourceAsync(source, _cts.Token);
-        }
-        finally
-        {
-            _switchLock.Release();
         }
     }
     

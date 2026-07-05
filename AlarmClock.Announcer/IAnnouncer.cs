@@ -5,5 +5,5 @@ namespace AlarmClock.Announcer;
 
 public interface IAnnouncer
 {
-    public Task SayAsync(string text, CancellationToken cancellationToken);
+    public Task EnqueueSayAsync(string text, CancellationToken cancellationToken);
 }

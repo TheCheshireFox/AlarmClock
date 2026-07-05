@@ -30,7 +30,7 @@ public sealed class GpioAlarmBuzzer : IAlarmBuzzer, IDisposable
 
         var rc = _lGpio.ClaimOutput(_handle, 0, _config.Pin, 0);
         if (rc < 0)
-            throw new Exception($"GpioClaimOutput failed for pin {_config.Pin}: {rc}");
+            throw new Exception($"ClaimOutput failed for pin {_config.Pin}: {rc}");
 
         _logger.LogInformation("GPIO buzzer initialized on pin {Pin}", _config.Pin);
     }

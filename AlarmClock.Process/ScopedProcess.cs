@@ -89,7 +89,7 @@ public sealed partial class ScopedProcess : IAsyncDisposable
             return;
         }
         
-        await TerminateAsync(5000, KillSignal.SIGTERM, CancellationToken.None);
+        await TerminateAsync(5000, KillSignal.SIGKILL, CancellationToken.None);
         Process.Dispose();
     }
 }

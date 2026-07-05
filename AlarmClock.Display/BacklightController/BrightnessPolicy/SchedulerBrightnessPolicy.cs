@@ -12,27 +12,21 @@ public interface IBacklightSchedulerConfig
     double DimBrightness { get; }
 }
 
-public sealed class SchedulerBrightnessPolicy : IBrightnessPolicy, IAsyncDisposable
+public sealed class SchedulerBrightnessPolicy(
+    IBacklightSchedulerConfig config,
+    IService<IDisplayController> displayControllerService,
+    ILogger<SchedulerBrightnessPolicy> logger)
+    : IBrightnessPolicy, IAsyncDisposable
 {
-    private readonly IBacklightSchedulerConfig _config;
-    private readonly IService<IDisplayController> _displayControllerService;
-    private readonly ILogger<SchedulerBrightnessPolicy> _logger;
     private readonly CancellationTokenSource _cts = new();
 
     private Task _actionTask = Task.CompletedTask;
-
-    public SchedulerBrightnessPolicy(IBacklightSchedulerConfig config, IService<IDisplayController> displayControllerService, ILogger<SchedulerBrightnessPolicy> logger)
-    {
-        _config = config;
-        _displayControllerService = displayControllerService;
-        _logger = logger;
-    }
 
     public bool IsActive { get; private set; }
     
     public Task InitializeAsync(CancellationToken cancellationToken)
     {
-        Schedule(_config.DimStart, StartDim, "start dim");
+        Schedule(config.DimStart, StartDim, "start dim");
         return Task.CompletedTask;
     }
 
@@ -48,26 +42,26 @@ public sealed class SchedulerBrightnessPolicy : IBrightnessPolicy, IAsyncDisposa
             action();
         });
         
-        _logger.LogInformation("\"{ActionName}\" scheduled to {Target}", actionName, target);
+        logger.LogInformation("\"{ActionName}\" scheduled to {Target}", actionName, target);
     }
 
     private void StartDim()
     {
         IsActive = true;
-        _displayControllerService.Get().Dim(_config.DimBrightness);
-        Schedule(_config.DimStop, StopDim, "stop dim");
+        displayControllerService.Get().Dim(config.DimBrightness);
+        Schedule(config.DimStop, StopDim, "stop dim");
     }
 
     private void StopDim()
     {
         IsActive = false;
-        _displayControllerService.Get().Dim(1);
-        Schedule(_config.DimStart, StartDim, "start dim");
+        displayControllerService.Get().Dim(1);
+        Schedule(config.DimStart, StartDim, "start dim");
     }
 
     public async ValueTask DisposeAsync()
     {
         await _cts.CancelAsync();
-        await _actionTask.WithExceptionLogging(_logger);
+        await _actionTask.WithExceptionLogging(logger);
     }
 }

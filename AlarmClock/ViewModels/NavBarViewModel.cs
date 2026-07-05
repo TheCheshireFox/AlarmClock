@@ -3,7 +3,6 @@ using AlarmClock.Audio.AudioDevice;
 using AlarmClock.Configuration;
 using AlarmClock.Display.BacklightController;
 using AlarmClock.Radio;
-using AlarmClock.Utility;
 using Microsoft.Extensions.Options;
 using ReactiveUI;
 

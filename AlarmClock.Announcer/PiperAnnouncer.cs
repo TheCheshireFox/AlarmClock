@@ -35,7 +35,7 @@ public sealed class PiperAnnouncer : IAnnouncer, IAsyncDisposable
         _processingTask = Task.Factory.StartNew(ProcessPhrases,  TaskCreationOptions.LongRunning).Unwrap();
     }
     
-    public Task SayAsync(string text, CancellationToken cancellationToken)
+    public Task EnqueueSayAsync(string text, CancellationToken cancellationToken)
     {
         _phrases.Add((text, DateTime.UtcNow), cancellationToken);
         return Task.CompletedTask;

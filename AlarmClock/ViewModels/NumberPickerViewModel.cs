@@ -5,35 +5,32 @@ namespace AlarmClock.ViewModels;
 
 public class NumberPickerViewModel : ReactiveObject
 {
-    private int _selectedItem;
-    private double _contentHeight = 64;
-    private string _selectedItemText = "00";
     private double _scrollDistance;
 
-    public int Min { get; set; }
-    public int Max { get; set; } = 100;
-    
+    public int Min { get; init; }
+    public int Max { get; init; } = 100;
+
     public double ContentHeight
     {
-        get => _contentHeight;
-        set => this.RaiseAndSetIfChanged(ref _contentHeight, value);
-    }
-    
+        get;
+        set => this.RaiseAndSetIfChanged(ref field, value);
+    } = 64;
+
     public int SelectedItem
     {
-        get => _selectedItem;
+        get;
         set
         {
-            this.RaiseAndSetIfChanged(ref _selectedItem, value);
+            this.RaiseAndSetIfChanged(ref field, value);
             SetSelectedItemText();
         }
     }
 
     public string SelectedItemText
     {
-        get => _selectedItemText;
-        set => this.RaiseAndSetIfChanged(ref _selectedItemText, value);
-    }
+        get;
+        set => this.RaiseAndSetIfChanged(ref field, value);
+    } = "00";
 
     public void ScrollBy(double delta)
     {

@@ -11,14 +11,13 @@ public interface IConfigManager
 
 public class TomlConfigManager(string path, TomlSerializerOptions opts) : IConfigManager
 {
-    private readonly SemaphoreSlim _lock = new(1);
+    private readonly Lock _lock = new();
 
     public void Update<T>(T value) where T : notnull => Update(ConfigurationMetadataProvider.GetPath<T>(), value);
     
     public void Update<T>(string section, T value) where T : notnull
     {
-        _lock.Wait();
-        try
+        lock (_lock)
         {
             var pathSegments = section
                 .Split(':')
@@ -48,10 +47,6 @@ public class TomlConfigManager(string path, TomlSerializerOptions opts) : IConfi
                                      ?? throw new InvalidOperationException($"Invalid type for {pathSegments[^1]}");
 
             Save(root);
-        }
-        finally
-        {
-            _lock.Release();
         }
     }
 

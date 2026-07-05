@@ -4,19 +4,13 @@ using AlarmClock.Process;
 
 namespace AlarmClock.Audio.AudioSource;
 
-public class Mpg123RadioAudioSource : IAudioSource, IAsyncDisposable
+public class Mpg123RadioAudioSource(Uri uri) : IAudioSource, IAsyncDisposable
 {
-    private readonly Uri _uri;
     private readonly CancellationTokenSource _cts = new();
 
     private string _format = string.Empty;
     private int _sampleRate;
     private ScopedProcess? _mpg123Process;
-
-    public Mpg123RadioAudioSource(Uri uri)
-    {
-        _uri = uri;
-    }
 
     public Task InitializeAsync(AudioFormat format, CancellationToken cancellationToken)
     {
@@ -25,7 +19,7 @@ public class Mpg123RadioAudioSource : IAudioSource, IAsyncDisposable
             AudioEncoding.Signed => "s",
             AudioEncoding.Unsigned => "u",
             AudioEncoding.FloatingPoint => "f",
-            _ => throw new ArgumentOutOfRangeException()
+            _ => throw new ArgumentOutOfRangeException(nameof(format.Encoding), format.Encoding, "Invalid encoding")
         };
         _format += format.BitsPerSample.ToString();
         _sampleRate = format.SampleRate;
@@ -67,7 +61,7 @@ public class Mpg123RadioAudioSource : IAudioSource, IAsyncDisposable
     {
         _mpg123Process = new ScopedProcess(new ProcessStartInfo("mpg123")
         {
-            ArgumentList = { "-q", "-s", "-r", _sampleRate.ToString(), "-e", _format, _uri.AbsoluteUri },
+            ArgumentList = { "-q", "-s", "-r", _sampleRate.ToString(), "-e", _format, uri.AbsoluteUri },
             RedirectStandardOutput = true
         }, cancellationToken: _cts.Token);
     }

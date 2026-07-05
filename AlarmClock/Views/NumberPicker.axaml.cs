@@ -18,7 +18,7 @@ public partial class NumberPickerView : ReactiveUserControl<NumberPickerViewMode
         get => ViewModel?.ContentHeight ?? GetValue(ContentHeightProperty);
         set
         {
-            ViewModel.WhenNotNull(x => x.ContentHeight = value);
+            ViewModel?.ContentHeight = value;
             SetValue(ContentHeightProperty, value);
         }
     }

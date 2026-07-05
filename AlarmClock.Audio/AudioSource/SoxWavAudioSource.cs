@@ -5,10 +5,8 @@ using AlarmClock.Shared.Extensions;
 
 namespace AlarmClock.Audio.AudioSource;
 
-public sealed class SoxWavAudioSource : IAudioSource, IAsyncDisposable
+public sealed class SoxWavAudioSource(Stream wavStream, string[] effectsArgs) : IAudioSource, IAsyncDisposable
 {
-    private readonly Stream _wavStream;
-    private readonly string[] _effectsArgs;
     private readonly CancellationTokenSource _cts = new();
     
     private bool _paused;
@@ -16,24 +14,18 @@ public sealed class SoxWavAudioSource : IAudioSource, IAsyncDisposable
     private ScopedProcess? _process;
     private Task _copyTask = Task.CompletedTask;
 
-    public SoxWavAudioSource(Stream wavStream, string[] effectsArgs)
-    {
-        _wavStream = wavStream;
-        _effectsArgs = effectsArgs;
-    }
-
     public Task InitializeAsync(AudioFormat format, CancellationToken cancellationToken)
     {
         if (_process != null)
             return Task.CompletedTask;
         
-        _process = new ScopedProcess(new ProcessStartInfo("sox", CreateArguments(format, _effectsArgs))
+        _process = new ScopedProcess(new ProcessStartInfo("sox", CreateArguments(format, effectsArgs))
         {
             RedirectStandardInput = true,
             RedirectStandardOutput = true
         }, cancellationToken: _cts.Token);
         
-        _copyTask = _wavStream.CopyToAsync(_process.StandardInput, _cts.Token);
+        _copyTask = wavStream.CopyToAsync(_process.StandardInput, _cts.Token);
         
         return Task.CompletedTask;
     }
@@ -93,6 +85,6 @@ public sealed class SoxWavAudioSource : IAudioSource, IAsyncDisposable
             await _process.DisposeAsync();
         
         await _copyTask.WithExceptionLogging();
-        await _wavStream.DisposeAsync();
+        await wavStream.DisposeAsync();
     }
 }

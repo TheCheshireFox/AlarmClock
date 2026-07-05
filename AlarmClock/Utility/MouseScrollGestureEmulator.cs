@@ -5,10 +5,8 @@ using Avalonia.Input;
 
 namespace AlarmClock.Utility;
 
-public sealed class MouseScrollGestureEmulator : IDisposable
+public sealed class MouseScrollGestureEmulator(Control control) : IDisposable
 {
-    private readonly Control _control;
-
     private int _id;
     private bool _scrolling;
     private Point _lastPos;
@@ -16,16 +14,11 @@ public sealed class MouseScrollGestureEmulator : IDisposable
     private int _velocityCount;
     private DateTime _lastUpdate;
 
-    public MouseScrollGestureEmulator(Control control)
-    {
-        _control = control;
-    }
-
     public void Initialize()
     {
-        _control.AddHandler(InputElement.PointerPressedEvent, OnPointerPressed);
-        _control.AddHandler(InputElement.PointerReleasedEvent, OnPointerReleased);
-        _control.AddHandler(InputElement.PointerMovedEvent, OnPointerMoved);
+        control.AddHandler(InputElement.PointerPressedEvent, OnPointerPressed);
+        control.AddHandler(InputElement.PointerReleasedEvent, OnPointerReleased);
+        control.AddHandler(InputElement.PointerMovedEvent, OnPointerMoved);
     }
     
     private void OnPointerPressed(object? sender, PointerPressedEventArgs e)
@@ -41,7 +34,7 @@ public sealed class MouseScrollGestureEmulator : IDisposable
     private void OnPointerReleased(object? sender, PointerReleasedEventArgs e)
     {
         _scrolling = false;
-        _control.RaiseEvent(new ScrollGestureEndedEventArgs(_id));
+        control.RaiseEvent(new ScrollGestureEndedEventArgs(_id));
     }
 
     private void OnPointerMoved(object? sender, PointerEventArgs e)
@@ -66,13 +59,13 @@ public sealed class MouseScrollGestureEmulator : IDisposable
             _velocityCount++;
         }
         
-        _control.RaiseEvent(new ScrollGestureEventArgs(_id, delta));
+        control.RaiseEvent(new ScrollGestureEventArgs(_id, delta));
     }
 
     public void Dispose()
     {
-        _control.RemoveHandler(InputElement.PointerPressedEvent, OnPointerPressed);
-        _control.RemoveHandler(InputElement.PointerReleasedEvent, OnPointerReleased);
-        _control.RemoveHandler(InputElement.PointerMovedEvent, OnPointerMoved);
+        control.RemoveHandler(InputElement.PointerPressedEvent, OnPointerPressed);
+        control.RemoveHandler(InputElement.PointerReleasedEvent, OnPointerReleased);
+        control.RemoveHandler(InputElement.PointerMovedEvent, OnPointerMoved);
     }
 }

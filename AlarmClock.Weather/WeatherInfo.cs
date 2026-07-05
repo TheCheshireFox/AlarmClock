@@ -1,4 +1,3 @@
-using System;
 using AlarmClock.Weather.OpenWeather;
 
 namespace AlarmClock.Weather;

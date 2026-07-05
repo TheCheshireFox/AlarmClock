@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using AlarmClock.Process;
+using AlarmClock.Shared.Extensions;
 
 namespace AlarmClock.Audio.AudioSink;
 
@@ -20,15 +21,10 @@ public sealed class SoxAudioSink : IAudioSink, IAsyncDisposable
 
     public async Task WriteAsync(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken)
     {
-        await _lock.WaitAsync(cancellationToken);
-        try
+        using (await _lock.LockAsync(cancellationToken))
         {
             await EnsureStartedAsync();
             await _soxProcess!.StandardInput.WriteAsync(buffer, cancellationToken);
-        }
-        finally
-        {
-            _lock.Release();
         }
     }
 

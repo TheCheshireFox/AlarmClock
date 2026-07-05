@@ -20,7 +20,6 @@ public class SettingsViewModel : ReactiveObject, IActivatableViewModel, IRoutabl
 {
     private readonly IRadioListProvider _radioListProvider;
     private readonly IAlarmListProvider _alarmListProvider;
-    private readonly IConfigManager _configManager;
     private readonly IWiFiManager _wiFiManager;
 
     public ViewModelActivator Activator { get; }
@@ -89,12 +88,11 @@ public class SettingsViewModel : ReactiveObject, IActivatableViewModel, IRoutabl
     {
         _radioListProvider = radioListProvider;
         _alarmListProvider = alarmListProvider;
-        _configManager = configManager;
         _wiFiManager = wiFiManager;
 
         Activator = new ViewModelActivator();
         HostScreen = screen;
-        OpenWiFiSettings = ReactiveCommand.CreateFromObservable(() => screen.NavigateTo<WiFiSettingsViewModel>());
+        OpenWiFiSettings = ReactiveCommand.CreateFromObservable(screen.NavigateTo<WiFiSettingsViewModel>);
         RefreshWiFiStatus = ReactiveCommand.CreateFromTask(RefreshWiFiStatusAsync);
         
         this.WhenActivated(disposables =>
@@ -165,7 +163,7 @@ public class SettingsViewModel : ReactiveObject, IActivatableViewModel, IRoutabl
                             break;
                     }
         
-                    _configManager.Update(config);
+                    configManager.Update(config);
                 })
                 .DisposeWith(disposables);
             
@@ -175,7 +173,7 @@ public class SettingsViewModel : ReactiveObject, IActivatableViewModel, IRoutabl
                 .DistinctUntilChanged()
                 .Subscribe(radioName =>
                 {
-                    _configManager.Update(radioConfiguration, x => x.Name = radioName);
+                    configManager.Update(radioConfiguration, x => x.Name = radioName);
                 })
                 .DisposeWith(disposables);
         });
